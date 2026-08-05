@@ -1,0 +1,44 @@
+// lp_superficie.stan — SUPERFICIE f(s,h) + Sigma strutturata.
+// PARAMETRIZZAZIONE CENTRATA (come fase 2 validata): la non-centrata
+// creava un modo fasullo a sigma_h=0 con la P-spline (verificato:
+// centrata recupera IRF vera, NC collassa a zero). Cap. 4.5: NC solo se
+// necessario -> qui NON serve. Prior sigma_h/sd_shock dal file _scaled.
+data {
+  int<lower=1> TT; int<lower=1> K; int<lower=1> J; int<lower=1> H1;
+  int<lower=1> N; int<lower=1> K_ctrl;
+  matrix[N, J*K] TP; matrix[TT, H1] y_mat; matrix[TT, K_ctrl] X_ctrl;
+  matrix[H1, J*K] TP_pos; matrix[H1, J*K] TP_neg; matrix[H1, J*K] TP_zero;
+  real<lower=0> sigma_theta;
+}
+parameters {
+  vector[J*K] gamma; real<lower=0,upper=1> delta;
+  real<lower=0> sigma_h; real<lower=0> sd_shock;
+  real<lower=0> sigma; real<lower=0,upper=0.95> phi;
+  vector[K_ctrl] theta;
+}
+transformed parameters {
+  matrix[TT, H1] mu_mat;
+  { vector[N] mv = TP*gamma; vector[TT] cp = X_ctrl*theta;
+    for (t in 1:TT) for (h in 1:H1) mu_mat[t,h] = mv[(h-1)*TT+t] + cp[t]; }
+  matrix[H1,H1] Sig;
+  for (i in 1:H1) for (j in 1:H1)
+    Sig[i,j] = square(sigma)*sqrt(1.0*i*j)/(1-square(phi))*pow(phi,1.0*abs(i-j));
+  matrix[H1,H1] L_Sigma = cholesky_decompose(Sig);
+}
+model {
+  for (t in 1:TT) y_mat[t]' ~ multi_normal_cholesky(mu_mat[t]', L_Sigma);
+  delta ~ beta(2,2); phi ~ beta(2,4); sigma_h ~ gamma(2,0.1);
+  sigma ~ student_t(3,0,1); sd_shock ~ lognormal(0,0.7); theta ~ normal(0,sigma_theta);
+  for (j in 1:J) {
+    gamma[(j-1)*K+1] ~ normal(0, sigma_h/sqrt(1-square(delta)));
+    for (k in 2:K) gamma[(j-1)*K+k] ~ normal(delta*gamma[(j-1)*K+(k-1)], sigma_h);
+  }
+  for (k in 1:K) for (j in 3:J)
+    target += normal_lpdf(gamma[(j-1)*K+k]-2*gamma[(j-2)*K+k]+gamma[(j-3)*K+k] | 0, sd_shock);
+}
+generated quantities {
+  vector[H1] irf_pos = TP_pos*gamma - TP_zero*gamma;
+  vector[H1] irf_neg = TP_neg*gamma - TP_zero*gamma;
+  vector[TT] log_lik;
+  for (t in 1:TT) log_lik[t] = multi_normal_cholesky_lpdf(y_mat[t]' | mu_mat[t]', L_Sigma);
+}

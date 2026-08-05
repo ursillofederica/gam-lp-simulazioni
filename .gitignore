@@ -1,0 +1,16 @@
+# Output pesanti o rigenerabili (i fit si scaricano dalla release: v. README)
+output/*
+!output/GDPC1_raw.csv
+!output/phi_calibrati.rds
+
+# Figure e tabelle prodotte in locale
+figure/
+tabelle/
+
+# Binari Stan compilati e header generati
+stan/*
+!stan/*.stan
+
+.DS_Store
+.Rhistory
+.Rapp.history
