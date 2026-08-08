@@ -1,12 +1,8 @@
-# Tabelle LaTeX per § 5.3 (E2) e § 5.4 (E3), generate dai dati.
+# Tabelle LaTeX per 5.3 (E2) e 5.4 (E3), generate dai dati.
 # Fonte: output/diagnostiche_E2E3.rds (08_diagnostiche_E2E3.R).
-# Regola di lettura (§ 5.1): a ogni c la CELLA DIRETTA se esiste,
-# altrimenti la ripesatura con Pareto-k <= 0,7 (lista FONTE, come in
-# 10_figure_E2E3.R: se cambia la regola si tocca solo quella).
-# Eseguire dalla cartella degli script.
 d <- readRDS("output/diagnostiche_E2E3.rds")
-TAB <- "../../../05_tesi/tabelle"    # destinazione delle tabelle di tesi
-if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) }   # fuori dal progetto tesi
+TAB <- "../../../05_tesi/tabelle"  
+if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) }   
 it <- function(x, k = 3) gsub("\\.", "{,}", formatC(x, format = "f", digits = k))
 m_ <- function(x) paste0("$", x, "$")
 
@@ -37,14 +33,7 @@ diretta <- function(esp, mod, cc) {
 }
 GC <- c("1", "0.9", "0.8", "0.7")
 
-# ---- Ristime per CRITERIO DI INNESCO, ricostruite dai backup ----------------
-# Tre criteri distinti del protocollo § 5.1, da non confondere:
-#   init  = catene congelate all'inizializzazione -> ristima con init = 0,1
-#   div   = divergenze > 10 -> ristima con adapt_delta 0,99
-#   rhat  = rhat > 1,01 -> ristima (rifit automatico di 02_fitta.R al
-#           momento del fit, piu' le ristime successive alla scansione)
-# Il flag diagn$rifit copre div + rhat insieme: la quota rhat si ottiene
-# per differenza dai backup, che sono la traccia verificabile su disco.
+#  Ristime 
 reps_backup <- function(dirs, dgp, cella) {
   f <- unlist(lapply(dirs, function(dd)
     list.files(file.path("output/fit", dd),
@@ -71,8 +60,6 @@ tab_protocollo <- function(esp, celle, etich, file) {
     "\\midrule",
     paste0(mapply(riga, celle, etich), " \\\\"),
     "\\bottomrule", "\\end{tabular}"),
-    # niente nota sotto la tabella: criteri d'innesco e "nessuna replica
-    # esclusa" sono gia' nelle caption
     file.path(TAB, file))
 }
 
@@ -84,9 +71,8 @@ tab_protocollo("E3",
   c("strutturata", "strutturata_c70", "lkj", "lkj_c80", "lkj_c70"),
   c("strutturata", "strutturata", "LKJ", "LKJ", "LKJ"),
   "tab_e3_protocollo.tex")
-cat("tabelle protocollo scritte\n")
 
-# ---- Tabella: distribuzione delle diagnostiche (gemella di tab_e1_diagnostiche)
+# Tabella: distribuzione delle diagnostiche 
 tab_diagnostiche <- function(esp, celle, etich, file) {
   qr <- function(x, dd) sapply(quantile(x, c(0, .25, .5, .75, 1)),
                                function(v) m_(it(v, dd)))
@@ -115,9 +101,8 @@ tab_diagnostiche("E3",
   c("strutt.\\ ($c=1$)", "strutt.\\ ($c=0{,}7$)",
     "LKJ ($c=1$)", "LKJ ($c=0{,}8$)", "LKJ ($c=0{,}7$)"),
   "tab_e3_diagnostiche.tex")
-cat("tabelle distribuzione diagnostiche scritte\n")
 
-# ---- Tabella: affidabilita' della ripesatura -------------------------------
+# Tabella: affidabilità della ripesatura
 tab_ripesatura <- function(esp, celle, etich, file) {
   blocco <- function(m, nome) {
     rp <- d[[esp]][[m]]$ripesatura
@@ -135,8 +120,7 @@ tab_ripesatura <- function(esp, celle, etich, file) {
         if (j < length(celle)) "\\midrule"))),
     "\\bottomrule", "\\end{tabular}"), file.path(TAB, file))
 }
-# Tutte e 7 le celle: il paragrafo cita anche le ripesature dalle celle dirette,
-# quindi devono comparire tutte (non solo le due basi a c=1).
+
 tab_ripesatura("E2",
   c("lkj", "lkj_c90", "lkj_c80", "lkj_c70",
     "strutturata", "strutturata_c80", "strutturata_c70"),
@@ -148,11 +132,10 @@ tab_ripesatura("E3",
   c("lkj","lkj_c80","lkj_c70","strutturata","strutturata_c70"),
   c("LKJ ($c=1$)","LKJ ($c=0{,}8$)","LKJ ($c=0{,}7$)","strutt.\\ ($c=1$)","strutt.\\ ($c=0{,}7$)"),
   "tab_e3_ripesatura.tex")
-cat("tabella ripesatura E3 scritta\n")
 
-# ---- Tabella: validazione incrociata (solo E2: piu' strade allo stesso c) ---
-# Per ogni (modello, c bersaglio) elenca le vie valide -- fit diretto oppure
-# ripesatura con k_max <= 0.7 -- e la copertura che ciascuna restituisce.
+# Tabella: "convalida incrociata" (solo E2: piu' strade allo stesso c) ---
+# Per ogni (modello, c bersaglio) elenca le vie valide: fit diretto oppure
+# ripesatura con k_max <= 0.7 e la copertura che ciascuna restituisce.
 tab_crossval <- function(file) {
   celle_mod <- list(LKJ = c("lkj", "lkj_c90", "lkj_c80", "lkj_c70"),
                     strutturata = c("strutturata", "strutturata_c80", "strutturata_c70"))
@@ -192,9 +175,8 @@ tab_crossval <- function(file) {
     righe, "\\bottomrule", "\\end{tabular}"), file.path(TAB, file))
 }
 tab_crossval("tab_e2_crossval.tex")
-cat("tabella validazione incrociata E2 scritta\n")
 
-# ---- E2: curva in c (copertura, RMSE, ampiezza per i due modelli) -----------
+# E2: curva in c (copertura, RMSE, ampiezza per i due modelli) 
 riga_c <- function(cc) {
   s <- leggi("E2", "strutturata", cc); l <- leggi("E2", "lkj", cc)
   marca <- function(esp, mod) if (diretta(esp, mod, cc)) "$^{\\dagger}$" else ""
@@ -214,9 +196,8 @@ writeLines(c(
   "\\bottomrule", "\\end{tabular}",
   "\\\\[2pt]\\footnotesize $^{\\dagger}$ cella stimata direttamente alla potenza $c$; le altre voci sono ripesature con $\\hat{k} \\le 0{,}7$."),
   file.path(TAB, "tab_e2_curva.tex"))
-cat("tabella curva E2 scritta\n")
 
-# ---- E2: profilo per orizzonte, i due modelli a c = 1 e c = 0,7 -------------
+# E2: profilo per orizzonte, i due modelli a c = 1 e c = 0,7
 blocco_prof <- function(esp, mod, cc) {
   x <- leggi(esp, mod, cc)
   sapply(seq_along(x$cop_h), function(i) paste(i - 1,
@@ -236,9 +217,8 @@ writeLines(c(
   "\\multicolumn{6}{l}{\\emph{LKJ, $c = 0{,}7$}} \\\\",
   paste0(blocco_prof("E2", "lkj", "0.7"), " \\\\"),
   "\\bottomrule", "\\end{tabular}"), file.path(TAB, "tab_e2_profilo.tex"))
-cat("tabella profilo E2 scritta\n")
 
-# ---- E3: cella, due contrasti ----------------------------------------------
+# E3: cella, due contrasti 
 riga_c3 <- function(cc) {
   s <- leggi("E3", "strutturata", cc); l <- leggi("E3", "lkj", cc)
   marca <- function(mod) if (diretta("E3", mod, cc)) "$^{\\dagger}$" else ""
@@ -259,9 +239,8 @@ writeLines(c(
   "\\bottomrule", "\\end{tabular}",
   "\\\\[2pt]\\footnotesize L'ampiezza delle bande è identica nei due contrasti per costruzione. $^{\\dagger}$ cella stimata direttamente alla potenza $c$."),
   file.path(TAB, "tab_e3_cella.tex"))
-cat("tabella cella E3 scritta\n")
 
-# ---- E3: profilo per orizzonte nei due contrasti, c = 1 ---------------------
+# E3: profilo per orizzonte nei due contrasti, c = 1 
 blocco_prof3 <- function(mod, cc) {
   x <- leggi("E3", mod, cc)
   sapply(seq_along(x$pos$cop_h), function(i) paste(i - 1,
@@ -282,4 +261,4 @@ writeLines(c(
   "\\multicolumn{6}{l}{\\emph{LKJ, $c = 1$}} \\\\",
   paste0(blocco_prof3("lkj", "1"), " \\\\"),
   "\\bottomrule", "\\end{tabular}"), file.path(TAB, "tab_e3_profilo.tex"))
-cat("tabella profilo E3 scritta\n")
+
