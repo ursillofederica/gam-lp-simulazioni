@@ -84,8 +84,3 @@ to touch if it changes).
 `01_genera.R` regenerates the datasets deterministically from the seeds;
 `02_fitta.R` refits (4 chains per replica, ~1400 fits: hours of computation on
 several cores). The refit protocol is in the operational scripts listed above.
-
-<!-- TODO (Federica): AI-use statement per the UniPD guidelines, e.g.
-"Parts of this codebase and this README were drafted with the assistance of
-an AI tool (Claude) and subsequently reviewed and reworked by the author."
-Adapt the wording after reworking the README. -->
