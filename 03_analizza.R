@@ -1,20 +1,18 @@
-# ==============================================================================
-# 03_analizza.R — Cap. 5: ripesatura (PSIS) e metriche di copertura
+# 03_analizza.R: ripesatura (PSIS) e metriche di copertura
 #
 # Ripesatura per importance sampling via loo::psis (Vehtari, Gelman, Gabry;
 # PSIS: Vehtari et al. 2024, JMLR). Bande via Hmisc::wtd.quantile (Harrell).
 # Il calcolo delicato (stabilizzazione, lisciatura delle code, quantile
-# ponderato) e' nei pacchetti; codice originale = solo le definizioni di
-# copertura/bias/ampiezza del § 5.1 (Morris, White & Crowther 2019, Tab. 6).
-# ==============================================================================
+# ponderato) è nei pacchetti; codice originale = solo le definizioni di
+# copertura/bias/ampiezza (Morris, White & Crowther 2019, Tab. 6).
 
 suppressMessages({ library(loo); library(Hmisc) })
 
 GRIGLIA_C <- c(0.7, 0.8, 0.9, 1)
 LIVELLO   <- c(0.05, 0.95)                 # bande equal-tailed 90%
 
-# ---- Pesi per un dato c: PSIS su (c-base_c)*log_g -> pesi + Pareto-k + ESS ---
-# base_c = potenza a cui sono stati CAMPIONATI i fit (1 per le celle
+# Pesi per un dato c: PSIS su (c-base_c)*log_g -> pesi + Pareto-k + ESS
+# base_c = potenza a cui sono stati campionati i fit (1 per le celle
 # ordinarie; 0.8/0.9/... per le celle a c fisso, dedotta da c_pow).
 pesi_psis <- function(log_g, c, base_c = 1) {
     if (c == base_c) {                     # base: nessuna ripesatura, pesi uniformi
@@ -27,7 +25,7 @@ pesi_psis <- function(log_g, c, base_c = 1) {
     list(w = w, k = loo::pareto_k_values(ps), ess = 1 / sum(w^2))
 }
 
-# ---- Metriche di UNA serie di draw contro UN vero (le 3 def. del § 5.1) ------
+# Metriche di una serie di draw contro un vero (le 3 def. del 5.1)
 metriche_serie <- function(draws, vera, w) {
     H1 <- ncol(draws); lo <- md <- hi <- numeric(H1)
     for (h in 1:H1) {
@@ -35,15 +33,15 @@ metriche_serie <- function(draws, vera, w) {
                                  probs = c(LIVELLO[1], 0.5, LIVELLO[2]), normwt = TRUE)
         lo[h] <- q[1]; md[h] <- q[2]; hi[h] <- q[3]
     }
-    list(dentro   = vera >= lo & vera <= hi,   # copertura (Morris et al. 2019)
+    list(dentro   = vera >= lo & vera <= hi,    # copertura (Morris et al. 2019)
          bias     = md - vera,                  # bias
-         ampiezza = hi - lo)                     # ampiezza
+         ampiezza = hi - lo)                    # ampiezza
 }
 
-# ---- Metriche di UNA replica a un dato c ------------------------------------
+# Metriche di una replica a un dato c
 # Un contrasto (E1/E2): irf_vera vettore, irf_draws matrice.
 # Due contrasti (GHKP, tanh): irf_vera lista pos/neg. Il modello lineare produce
-# il solo contrasto unitario -> si SCALA per delta; la superficie da' gia' pos/neg.
+# il solo contrasto unitario, si scala per delta; la superficie dà già pos/neg.
 metriche_replica <- function(irf_draws, irf_vera, log_g, c, deltas = NULL,
                              base_c = 1) {
     pw <- pesi_psis(log_g, c, base_c)
@@ -61,27 +59,26 @@ metriche_replica <- function(irf_draws, irf_vera, log_g, c, deltas = NULL,
       list(k = pw$k, ess_rel = pw$ess / length(pw$w)))
 }
 
-# ---- Delta dei contrasti per DGP (per scalare il lineare a due contrasti) ----
-DELTAS <- list(nonlineare = c(2, -2), tanh = c(2, 1))   # coerenti con 02_fitta
+# Delta dei contrasti per DGP (per scalare il lineare a due contrasti) 
+DELTAS <- list(nonlineare = c(2, -2), tanh = c(2, 1))  
 
-# ---- Aggrega le metriche di una serie (pos/neg o singola) sulle repliche -----
-aggrega_serie <- function(serie_list) {  # lista di list(dentro,bias,ampiezza)
+# Aggrega le metriche di una serie (pos/neg o singola) sulle repliche
+aggrega_serie <- function(serie_list) {  
     list(copertura_h = rowMeans(sapply(serie_list, `[[`, "dentro")),
          bias_h      = rowMeans(sapply(serie_list, `[[`, "bias")),
          ampiezza_h  = apply(sapply(serie_list, `[[`, "ampiezza"), 1, median))
 }
 
-# ---- Aggregazione su una cella (dgp x modello), tutta la griglia di c --------
+# Aggregazione su una cella (dgp x modello), tutta la griglia di c 
 analizza_cella <- function(dgp, modello, c_grid = GRIGLIA_C) {
     files <- list.files(file.path("output", "fit", dgp, modello),
                         pattern = "^rep_", full.names = TRUE)
     stopifnot(length(files) > 0)
     fits  <- lapply(files, readRDS)
-    due   <- is.list(fits[[1]]$irf_vera)              # due contrasti?
+    due   <- is.list(fits[[1]]$irf_vera)             
     deltas <- DELTAS[[dgp]]
     # base_c dedotta dai fit stessi (c_pow salvato da fitta_replica_pow):
-    # le celle campionate a c fisso vengono ripesate dalla loro base vera,
-    # non da c=1
+    # le celle campionate a c fisso vengono ripesate dalla loro base vera
     base_c <- if (!is.null(fits[[1]]$c_pow)) fits[[1]]$c_pow else 1
     out <- list()
     for (c in c_grid) {
@@ -106,7 +103,6 @@ analizza_cella <- function(dgp, modello, c_grid = GRIGLIA_C) {
     out
 }
 
-# ---- Stampa sintetica di una cella ------------------------------------------
 stampa_cella <- function(res, dgp, modello) {
     cat("====", dgp, "x", modello, "| R =", res[[1]]$R,
         "| base c =", res[[1]]$base_c, "====\n")
