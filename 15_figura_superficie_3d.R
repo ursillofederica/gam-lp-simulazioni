@@ -1,7 +1,7 @@
 # Grafico 2 del recupero tanh: la superficie f(s,h) in 3D, vera contro stimata.
 # Fonte: output/superficie_tanh_griglia.rds (14_superficie_tanh_3d.R).
 # Output: fig_E3_superficie_3d.pdf (persp base R, due pannelli).
-# Eseguire dalla cartella cap5.
+# Eseguire dalla cartella degli script.
 FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
 if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   # fuori dal progetto tesi
 g <- readRDS("output/superficie_tanh_griglia.rds")

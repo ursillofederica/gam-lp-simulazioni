@@ -1,7 +1,7 @@
 # Grafico 1 del recupero tanh: i due contrasti di taglia (delta = 1 e delta = 2)
 # nello STESSO pannello, con mediana a posteriori, banda al 90% e valore vero.
 # Fonte: output/reperti_E3.rds (nessun rifit). Output: fig_E3_tanh_unico.pdf
-# Eseguire dalla cartella cap5.
+# Eseguire dalla cartella degli script.
 library(ggplot2)
 FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
 if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   # fuori dal progetto tesi

@@ -1,7 +1,7 @@
 # Diagnostiche E1: certificazione di convergenza -> affidabilita' della
 # ripesatura -> calibrazione estesa (errore MC esatto, RMSE, copertura
 # congiunta). Riusa pesi_psis e le librerie di 03_analizza.R (loo, Hmisc).
-# Eseguire dalla cartella cap5.
+# Eseguire dalla cartella degli script.
 source("03_analizza.R")
 
 # repliche ristimate per l'INIZIALIZZAZIONE (catena congelata all'avvio),

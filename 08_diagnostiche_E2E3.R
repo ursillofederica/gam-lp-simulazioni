@@ -1,6 +1,6 @@
 # Diagnostiche e calibrazione estesa per E2 (persistente) ed E3 (nonlineare):
 # generalizza 06_diagnostiche_E1.R a celle con base_c e ai due contrasti.
-# Output: output/diagnostiche_E2E3.rds. Eseguire dalla cartella cap5.
+# Output: output/diagnostiche_E2E3.rds. Eseguire dalla cartella degli script.
 source("03_analizza.R")
 
 # ristime per INIZIALIZZAZIONE (catene congelate all'avvio)

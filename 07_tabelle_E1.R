@@ -1,6 +1,6 @@
 # Tabelle LaTeX per il § 5.2 (E1), generate dai dati (riproducibili).
 # Output in TAB: tab_e1_{protocollo,diagnostiche,ripesatura,cella,profilo}.tex
-# Eseguire dalla cartella cap5.
+# Eseguire dalla cartella degli script.
 TAB <- "../../../05_tesi/tabelle"    # destinazione delle tabelle di tesi
 if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) }   # fuori dal progetto tesi
 diag <- readRDS("output/diagnostiche_E1.rds")

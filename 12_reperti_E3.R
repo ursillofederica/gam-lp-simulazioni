@@ -5,7 +5,7 @@
 #   3. recupero a segnale forte, DGP tanh (output/fit/tanh/superficie_strutturata)
 # Produce: output/reperti_E3.rds (riassunti leggeri, cosi' il rapporto non
 # rilegge i fit da 2 MB), le figure di tesi e tab_e3_reperti.tex.
-# Eseguire dalla cartella cap5.
+# Eseguire dalla cartella degli script.
 library(ggplot2)
 FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
 if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   # fuori dal progetto tesi

@@ -3,7 +3,7 @@
 # riesegue UNA volta il fit tanh buono (stesso seed del reperto, seed=1500)
 # solo per estrarre i coefficienti gamma. NON sovrascrive il fit su disco:
 # salva la superficie in output/superficie_tanh_griglia.rds.
-# Eseguire dalla cartella cap5.
+# Eseguire dalla cartella degli script.
 source("02_fitta.R")   # basi (B_H, nodi_s, J_S, K_H), MODELLI, costanti
 
 d <- readRDS(file.path(DIR_OUT, "tanh", "rep_001.rds"))

@@ -1,7 +1,7 @@
 # GAM frequentista di controllo per E3/GHKP: stessa replica del reperto
 # bayesiano (rep_001), superficie tensoriale gemella (bs, k = c(6,8)),
 # REML, controlli lineari per orizzonte. Domanda: anche la macchina
-# frequentista spegne la non linearita'? Eseguire dalla cartella cap5.
+# frequentista spegne la non linearita'? Eseguire dalla cartella degli script.
 library(mgcv)
 source("01_genera.R")   # TT, H, H1
 

@@ -3,7 +3,7 @@
 # Regola di lettura (§ 5.1): a ogni c la CELLA DIRETTA se esiste,
 # altrimenti la ripesatura con Pareto-k <= 0,7 (lista FONTE, come in
 # 10_figure_E2E3.R: se cambia la regola si tocca solo quella).
-# Eseguire dalla cartella cap5.
+# Eseguire dalla cartella degli script.
 d <- readRDS("output/diagnostiche_E2E3.rds")
 TAB <- "../../../05_tesi/tabelle"    # destinazione delle tabelle di tesi
 if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) }   # fuori dal progetto tesi

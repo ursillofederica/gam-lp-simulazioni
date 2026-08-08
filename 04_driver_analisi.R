@@ -1,6 +1,6 @@
 # Driver: analizza tutte le celle dello studio (E1-E3, celle base e a c
 # fisso) con 03_analizza.R e salva il riepilogo unico usato da figure,
-# tabelle e rapporto. Eseguire dalla cartella cap5.
+# tabelle e rapporto. Eseguire dalla cartella degli script.
 source("03_analizza.R")
 
 celle <- list(

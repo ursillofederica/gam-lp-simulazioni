@@ -2,7 +2,7 @@
 # Stesso stile grafico di 05_figure_E1.R.
 # Regola di lettura (protocollo § 5.1): a ogni c si usa la CELLA DIRETTA se
 # esiste, altrimenti la ripesatura con Pareto-k <= 0,7.
-# Output in FIG: fig_E2_*.pdf, fig_E3_*.pdf. Eseguire dalla cartella cap5.
+# Output in FIG: fig_E2_*.pdf, fig_E3_*.pdf. Eseguire dalla cartella degli script.
 library(ggplot2)
 library(gridExtra)
 

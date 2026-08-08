@@ -1,7 +1,7 @@
 # Figure per § 5.2 (E1, disegno di riferimento), in ggplot2.
 # Input:  output/risultati_completi_22lug.rds, output/diagnostiche_E1.rds.
 # Output in FIG: fig_E1_divergenze, fig_E1_pareto_k, fig_E1_copertura,
-# fig_E1_amp_rmse. Eseguire dalla cartella cap5.
+# fig_E1_amp_rmse. Eseguire dalla cartella degli script.
 library(ggplot2)
 FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
 if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   # fuori dal progetto tesi
