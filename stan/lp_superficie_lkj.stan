@@ -1,9 +1,6 @@
-// lp_superficie_lkj.stan — SUPERFICIE f(s,h) + Sigma LIBERA (LKJ).
-// PARAMETRIZZAZIONE CENTRATA: la non-centrata
-// creava un modo fasullo a sigma_h=0 con la P-spline (verificato:
-// centrata recupera IRF vera, NC collassa a zero). Cap. 4.5: NC solo se
-// necessario -> qui NON serve. Prior: sigma_h ~ gamma(2, 0.1),
-// sd_shock ~ lognormal(0, 0.7).
+// lp_superficie_lkj.stan: superficie f(s,h) + Sigma LIBERA (LKJ).
+// parametrizzazione centrata.
+
 data {
   int<lower=1> TT; int<lower=1> K; int<lower=1> J; int<lower=1> H1;
   int<lower=1> N; int<lower=1> K_ctrl;
