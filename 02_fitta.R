@@ -1,22 +1,19 @@
-# ==============================================================================
-# 02_fitta.R — Cap. 5: stima dei modelli sulle repliche congelate
+# 02_fitta.R: stima dei modelli sulle repliche congelate
 #
 # Legge le repliche da output/dati/<dgp>/, costruisce basi e stan_data
-# (contratto di 01_genera.R), stima con cmdstanr (compile-once) e salva
+# (contratto di 01_genera.R), stima con cmdstanr e salva
 # in output/fit/<dgp>/<modello>/rep_<r>.rds:
 #   draw della IRF, log g per draw (per la ripesatura), diagnostiche.
 #
-# Specifiche § 5.1: 4 catene, 1000 warmup + 2000 sampling, adapt_delta 0.95.
-# Base su h: B-spline cubica K = 8, nodi interni ESPLICITI equispaziati
-# (come dichiarato nel § 5.1: il codice dice quello che dice la tesi).
-# ==============================================================================
+# Specifiche: 4 catene, 1000 warmup + 2000 sampling, adapt_delta 0.95.
+# Base su h: B-spline cubica K = 8, nodi interni equispaziati
 
 library(cmdstanr)
 library(splines)
 
-source("01_genera.R")     # costanti del protocollo (TT, H, H1, ...)
+source("01_genera.R")     
 
-# ---- Base sull'orizzonte: K = 8, cubica, nodi interni equispaziati ----------
+# Base sull'orizzonte: K = 8, cubica, nodi interni equispaziati 
 K_H     <- 8
 h_grid  <- 0:H
 n_nodi  <- K_H - 4                                   # cubica con intercetta: df = nodi + 4
@@ -24,29 +21,29 @@ nodi_h  <- seq(0, H, length.out = n_nodi + 2)[-c(1, n_nodi + 2)]  # interni, equ
 B_H     <- bs(h_grid, knots = nodi_h, degree = 3, intercept = TRUE)
 stopifnot(ncol(B_H) == K_H)
 
-# ---- stan_data dal contratto del generatore ---------------------------------
+# stan_data 
 # Ordinamento del vettore impilato: h esterno, t interno (come nei .stan:
-# mu_vec[(h-1)*TT + t]). TP = kronecker(B_H, s) fa esattamente questo.
+# mu_vec[(h-1)*TT + t]). TP = kronecker(B_H, s)
 costruisci_stan_data <- function(d, sigma_theta = 1) {
     TP <- kronecker(as.matrix(B_H), matrix(d$s, ncol = 1))
     list(TT = TT, K = K_H, H1 = H1, N = TT * H1,
          K_ctrl = ncol(d$X_ctrl),
          TP = TP, y_mat = d$y_mat, X_ctrl = d$X_ctrl,
-         TP_s1 = as.matrix(B_H),          # contrasto unitario: irf = B_H %*% gamma
+         TP_s1 = as.matrix(B_H),         
          sigma_theta = sigma_theta)
 }
 
-# ---- Base sullo shock (superficie, Processo 3): J = 6, frontiera ±4 ---------
+# Base sullo shock (superficie, Processo 3): J = 6
 J_S     <- 6
-n_nodi_s <- J_S - 4
+n_nodi_s <- J_S - 4 
 nodi_s  <- seq(-4, 4, length.out = n_nodi_s + 2)[-c(1, n_nodi_s + 2)]
 
-# ---- stan_data per la SUPERFICIE (Processo 3) -------------------------------
+# stan_data per la superficie
 # TP[(h-1)*TT + t, (j-1)*K + k] = B_s[t, j] * B_H[h, k]: colonna per colonna
 # via prodotto di Kronecker vettoriale (h esterno, t interno come nei .stan).
 costruisci_stan_data_superficie <- function(d, sigma_theta = 1, deltas = c(2, -2)) {
     # deltas = c(a, b): irf_pos = contrasto a delta a, irf_neg a delta b.
-    # GHKP (angolo): c(2, -2) segno; tanh (saturazione, dispari): c(2, 1) taglia.
+    # GHKP: c(2, -2) segno; tanh (saturazione, dispari): c(2, 1) taglia.
     B_S     <- bs(d$s, knots = nodi_s, degree = 3, intercept = TRUE,
                   Boundary.knots = c(-4, 4))
     b_pos  <- predict(B_S, deltas[1]); b_neg <- predict(B_S, deltas[2]); b_zero <- predict(B_S, 0)
@@ -66,7 +63,6 @@ costruisci_stan_data_superficie <- function(d, sigma_theta = 1, deltas = c(2, -2
          sigma_theta = sigma_theta)
 }
 
-# ---- Compile-once -----------------------------------------------------------
 MODELLI <- list(
     strutturata            = cmdstan_model(file.path("stan", "lp_lineare_strutturata.stan")),
     lkj                    = cmdstan_model(file.path("stan", "lp_lineare_lkj.stan")),
@@ -74,12 +70,12 @@ MODELLI <- list(
     superficie_lkj         = cmdstan_model(file.path("stan", "lp_superficie_lkj.stan"))
 )
 
-# ---- Fit di una replica -----------------------------------------------------
+# Fit di una replica 
 fitta_replica <- function(dgp, r, modello,
                           adapt_delta = 0.95, seed_stan = 999) {
     d  <- readRDS(file.path(DIR_OUT, dgp, sprintf("rep_%03d.rds", r)))
     superficie <- startsWith(modello, "superficie")
-    deltas <- if (dgp == "tanh") c(2, 1) else c(2, -2)   # taglia vs segno
+    deltas <- if (dgp == "tanh") c(2, 1) else c(2, -2)  
     sd_stan <- if (superficie) costruisci_stan_data_superficie(d, deltas = deltas)
                else            costruisci_stan_data(d)
 
@@ -87,7 +83,7 @@ fitta_replica <- function(dgp, r, modello,
         data = sd_stan, chains = 4, parallel_chains = 4,
         iter_warmup = 1000, iter_sampling = 2000,
         adapt_delta = adapt_delta, seed = seed_stan + r,
-        init = 0.1,   # init strette: evitano un Cholesky quasi singolare all'avvio (catena congelata)
+        init = 0.1,   # init per evitare un Cholesky quasi singolare all'avvio (catena bloccata in partenza)
         refresh = 0, show_messages = FALSE)
 
     if (superficie) {
@@ -105,14 +101,13 @@ fitta_replica <- function(dgp, r, modello,
         ess_bulk_min = min(riass$ess_bulk, na.rm = TRUE),
         rifit = FALSE)
 
-    # Politica repliche fallite (§ 5.1): un rifit con adapt_delta alzato;
-    # se il problema persiste la replica viene salvata e RIPORTATA, mai esclusa.
+    # Politica repliche fallite: un rifit con adapt_delta alzato;
     if (diagn$rhat_max > 1.01 && adapt_delta < 0.99) {
         out2 <- fitta_replica(dgp, r, modello,
                               adapt_delta = 0.99, seed_stan = seed_stan + 500)
         out2$diagn$rifit <- TRUE
         saveRDS(out2, file.path("output", "fit", dgp, modello,
-                                sprintf("rep_%03d.rds", r)))   # flag persistito
+                                sprintf("rep_%03d.rds", r)))   
         return(invisible(out2))
     }
 
@@ -125,7 +120,7 @@ fitta_replica <- function(dgp, r, modello,
     invisible(out)
 }
 
-# ---- Loop su un blocco di repliche (riprende da dove era rimasto) -----------
+# Ciclo su un blocco di repliche
 fitta_blocco <- function(dgp, modello, repliche) {
     for (r in repliche) {
         percorso <- file.path("output", "fit", dgp, modello,
@@ -137,8 +132,7 @@ fitta_blocco <- function(dgp, modello, repliche) {
     }
 }
 
-# ---- Fit DIRETTI alla potenza c (variante _pow; § 5.1: regola ESS<10%) ------
-# Compilati alla prima richiesta per non disturbare i run in corso.
+# Fit diretti alla potenza c
 MODELLI_POW <- new.env()
 modello_pow <- function(modello) {
     if (is.null(MODELLI_POW[[modello]]))
@@ -156,7 +150,7 @@ fitta_replica_pow <- function(dgp, r, modello, c_pow,
         data = sd_stan, chains = 4, parallel_chains = 4,
         iter_warmup = 1000, iter_sampling = 2000,
         adapt_delta = adapt_delta, seed = seed_stan + r,
-        init = 0.1,   # init strette: evitano un Cholesky quasi singolare all'avvio (catena congelata)
+        init = 0.1,  
         refresh = 0, show_messages = FALSE)
     irf_draws <- fit$draws("irf", format = "matrix")
     riass <- fit$summary(variables = "irf")
@@ -187,6 +181,3 @@ fitta_blocco_pow <- function(dgp, modello, repliche, c_pow) {
     }
 }
 
-# ---- Esecuzione (decommentare per i run) ------------------------------------
-# fitta_blocco("pilota", "strutturata", 1:R_PILOT)   # 🚦 cancello, braccio 1
-# fitta_blocco("pilota", "lkj",         1:R_PILOT)   # 🚦 cancello, braccio 2
