@@ -1,10 +1,10 @@
 # Grafico 1 del recupero tanh: i due contrasti di taglia (delta = 1 e delta = 2)
-# nello STESSO pannello, con mediana a posteriori, banda al 90% e valore vero.
+#  con mediana a posteriori, banda al 90% e valore vero.
 # Fonte: output/reperti_E3.rds (nessun rifit). Output: fig_E3_tanh_unico.pdf
 # Eseguire dalla cartella degli script.
 library(ggplot2)
-FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
-if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   # fuori dal progetto tesi
+FIG <- "../../../05_tesi/figure"    
+if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   
 h <- 0:16
 col1 <- "#1a1a1a"   # delta = 1
 col2 <- "#e67e22"   # delta = 2
@@ -41,4 +41,4 @@ p <- ggplot(dd, aes(h, group = contrasto)) +
         legend.position = c(0.12, 0.86),
         legend.background = element_rect(fill = "white", color = NA))
 ggsave(file.path(FIG, "fig_E3_tanh_unico.pdf"), p, width = 6.4, height = 4)
-cat("fig_E3_tanh_unico scritta\n")
+
