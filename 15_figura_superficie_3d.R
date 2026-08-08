@@ -1,16 +1,14 @@
 # Grafico 2 del recupero tanh: la superficie f(s,h) in 3D, vera contro stimata.
 # Fonte: output/superficie_tanh_griglia.rds (14_superficie_tanh_3d.R).
-# Output: fig_E3_superficie_3d.pdf (persp base R, due pannelli).
+# Output: fig_E3_superficie_3d.pdf
 # Eseguire dalla cartella degli script.
-FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
-if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   # fuori dal progetto tesi
+FIG <- "../../../05_tesi/figure"   
+if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   
 g <- readRDS("output/superficie_tanh_griglia.rds")
 
-# persp vuole z con righe = x (s) e colonne = y (h): traspongo (dati sono h x s)
 z_true <- t(g$vera); z_est <- t(g$est)
 zlim <- range(z_true, z_est)
 
-# colore per faccetta secondo l'altezza media (grigio -> arancio)
 pal <- colorRampPalette(c("#f0f0f0", "#f6c28b", "#e67e22"))(64)
 faccia <- function(z) {
   nr <- nrow(z); nc <- ncol(z)
