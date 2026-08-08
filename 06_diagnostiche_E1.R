@@ -1,11 +1,9 @@
-# Diagnostiche E1: certificazione di convergenza -> affidabilita' della
-# ripesatura -> calibrazione estesa (errore MC esatto, RMSE, copertura
+# Diagnostiche E1: certificazione di convergenza, affidabilita' della
+# ripesatura, calibrazione estesa (errore MC esatto, RMSE, copertura
 # congiunta). Riusa pesi_psis e le librerie di 03_analizza.R (loo, Hmisc).
 # Eseguire dalla cartella degli script.
 source("03_analizza.R")
 
-# repliche ristimate per l'INIZIALIZZAZIONE (catena congelata all'avvio),
-# distinte dai rifit per divergenze (flag rifit)
 INIT_REFIT <- list(lkj = c(8, 61, 65, 69), strutturata = integer(0))
 
 out <- list()
@@ -14,7 +12,7 @@ for (m in c("lkj", "strutturata")) {
                             pattern = "^rep_", full.names = TRUE), readRDS)
   R <- length(fits)
 
-  ## 1) CERTIFICAZIONE DI CONVERGENZA (post-protocollo + storia)
+  ## 1) convergenza
   rhat <- sapply(fits, function(f) f$diagn$rhat_max)
   div  <- sapply(fits, function(f) f$diagn$divergenze)
   essb <- sapply(fits, function(f) f$diagn$ess_bulk_min)
@@ -27,7 +25,7 @@ for (m in c("lkj", "strutturata")) {
                      rhat_max = max(rhat), div_max_post = max(div),
                      ess_min = round(min(essb)), quota_div0 = mean(div == 0))
 
-  ## 2) DIAGNOSTICHE DELLA RIPESATURA (per c bersaglio)
+  ## 2) ripesatura
   sd_logg <- sapply(fits, function(f) sd(f$log_g))
   rip <- do.call(rbind, lapply(c(0.9, 0.8, 0.7), function(cc) {
     pw <- lapply(fits, function(f) pesi_psis(f$log_g, cc))
@@ -36,7 +34,7 @@ for (m in c("lkj", "strutturata")) {
                quota_k_alto = mean(k > 0.7), ess_rel_med = median(er))
   }))
 
-  ## 3) CALIBRAZIONE ESTESA (c = 1 e 0.9)
+  ## 3) calibrazone estesa
   cal <- lapply(c("1" = 1, "0.9" = 0.9), function(cc) {
     per_rep <- lapply(fits, function(f) {
       w <- pesi_psis(f$log_g, cc)$w
@@ -55,7 +53,7 @@ for (m in c("lkj", "strutturata")) {
          amp_h  = apply(amp, 1, median),
          cop_congiunta = mean(colSums(dentro) == nrow(dentro)))
   })
-  # per replica (per le distribuzioni nel rapporto Rmd)
+    
   k_per_c <- sapply(c("0.9" = 0.9, "0.8" = 0.8, "0.7" = 0.7), function(cc)
     sapply(fits, function(f) pesi_psis(f$log_g, cc)$k))
   out[[m]] <- list(cert = cert, sd_logg_med = median(sd_logg),
@@ -77,4 +75,3 @@ for (m in c("lkj", "strutturata")) {
               mean(out[[m]]$calibrazione$`0.9`$rmse_h)))
 }
 saveRDS(out, "output/diagnostiche_E1.rds")
-cat("\nSalvato output/diagnostiche_E1.rds\n")
