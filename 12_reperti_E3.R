@@ -1,16 +1,13 @@
-# Reperti di E3 (fuori dalle celle MC: una replica per disegno).
-# Tre pezzi:
 #   1. superficie bayesiana su GHKP  (output/fit/nonlineare/superficie_strutturata)
 #   2. GAM frequentista di controllo (output/gam_controllo_E3.rds)
 #   3. recupero a segnale forte, DGP tanh (output/fit/tanh/superficie_strutturata)
-# Produce: output/reperti_E3.rds (riassunti leggeri: le analisi a valle non
-# rileggono i fit da 2 MB), le figure di tesi e tab_e3_reperti.tex.
-# Eseguire dalla cartella degli script.
+# Produce: output/reperti_E3.rds 
+
 library(ggplot2)
-FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
-if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   # fuori dal progetto tesi
-TAB <- "../../../05_tesi/tabelle"   # destinazione delle tabelle di tesi
-if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) }   # fuori dal progetto tesi
+FIG <- "../../../05_tesi/figure"    
+if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   
+TAB <- "../../../05_tesi/tabelle"  
+if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) }   
 h <- 0:16
 col_str <- "#1a1a1a"; col_acc <- "#e67e22"
 tema <- theme_minimal(base_size = 11) +
@@ -23,7 +20,7 @@ tema <- theme_minimal(base_size = 11) +
         legend.position = "bottom",
         strip.text = element_text(size = 10.5, color = "grey20"))
 
-# ---- riassunto di una serie di draw: mediana, banda 90%, mediane per catena --
+# riassunto di una serie di draw: mediana, banda 90%, mediane per catena
 riassumi <- function(dr) {
   q <- apply(dr, 2, quantile, probs = c(0.05, 0.5, 0.95))
   nc <- attr(dr, "nchains"); per <- nrow(dr) / nc
@@ -32,13 +29,11 @@ riassumi <- function(dr) {
   list(lo = q[1, ], med = q[2, ], hi = q[3, ], per_catena = per_catena)
 }
 
-# =============================================================================
-# 1. Superficie bayesiana su GHKP
-# =============================================================================
+
+# Superficie bayesiana su GHKP
 sup <- readRDS("output/fit/nonlineare/superficie_strutturata/rep_001.rds")
 S_pos <- riassumi(sup$irf_draws$pos); S_neg <- riassumi(sup$irf_draws$neg)
 
-cat("== superficie su GHKP, rep_001\n")
 cat("   rhat", round(sup$diagn$rhat_max, 3), "| div", sup$diagn$divergenze,
     "| ess", round(sup$diagn$ess_bulk_min), "\n")
 cat("   max |mediana| pos:", signif(max(abs(S_pos$med)), 3),
@@ -72,29 +67,23 @@ p_sup <- ggplot(d_sup, aes(h)) +
   scale_x_continuous(breaks = seq(0, 16, 4)) +
   labs(x = "orizzonte h", y = "risposta d'impulso") + tema
 ggsave(file.path(FIG, "fig_E3_superficie.pdf"), p_sup, width = 8, height = 3.6)
-cat("   fig_E3_superficie scritta\n")
 
-# =============================================================================
-# 2. GAM frequentista di controllo (gia' stimato: 09_gam_controllo.R)
-# =============================================================================
+
+# GAM frequentista di controllo 
 gam <- readRDS("output/gam_controllo_E3.rds")
 cat("\n== GAM di controllo: EDF", round(gam$edf_te, 2),
     "| sp", paste(format(gam$sp, digits = 4), collapse = " / "),
     "| max |IRF| pos", max(abs(gam$tab$gam_pos)),
     "neg", max(abs(gam$tab$gam_neg)), "\n")
 
-# =============================================================================
-# 3. Recupero a segnale forte: DGP tanh
-# =============================================================================
-# deltas del tanh = c(2, 1) (taglia, non segno): irf_draws$pos e' delta = 2,
-# $neg e' delta = 1. Il vero e' salvato come d1 (delta 1) e d2 (delta 2):
-# l'accoppiamento va verificato, non assunto.
+
+# Recupero a segnale forte: DGP tanh
 th <- readRDS("output/fit/tanh/superficie_strutturata/rep_001.rds")
 T_d2 <- riassumi(th$irf_draws$pos)   # delta = 2
 T_d1 <- riassumi(th$irf_draws$neg)   # delta = 1
 # Controllo dell'accoppiamento: ogni serie deve stare piu' vicina al proprio
 # vero che all'altro. Se il fit e' degenere (tutte le mediane a zero) le due
-# distanze coincidono e il controllo non discrimina: va segnalato, non ignorato.
+# distanze coincidono 
 d_22 <- max(abs(T_d2$med - th$irf_vera$d2)); d_21 <- max(abs(T_d2$med - th$irf_vera$d1))
 d_11 <- max(abs(T_d1$med - th$irf_vera$d1)); d_12 <- max(abs(T_d1$med - th$irf_vera$d2))
 if (isTRUE(all.equal(d_22, d_21)) || isTRUE(all.equal(d_11, d_12)))
@@ -131,11 +120,8 @@ p_th <- ggplot(d_th, aes(h)) +
   scale_x_continuous(breaks = seq(0, 16, 4)) +
   labs(x = "orizzonte h", y = "risposta d'impulso") + tema
 ggsave(file.path(FIG, "fig_E3_tanh.pdf"), p_th, width = 8, height = 3.6)
-cat("   fig_E3_tanh scritta\n")
 
-# =============================================================================
-# Riassunti leggeri per il rapporto + tabella di tesi
-# =============================================================================
+
 rep_out <- list(
   superficie = list(diagn = sup$diagn, pos = S_pos, neg = S_neg,
                     vera = sup$irf_vera, log_g_catena = sapply(1:4, function(i)
@@ -145,7 +131,6 @@ rep_out <- list(
               dentro = c(d1 = dentro(T_d1, th$irf_vera$d1),
                          d2 = dentro(T_d2, th$irf_vera$d2))))
 saveRDS(rep_out, "output/reperti_E3.rds")
-cat("\nSalvato output/reperti_E3.rds\n")
 
 it <- function(x, k = 2) gsub("\\.", "{,}", formatC(x, format = "f", digits = k))
 writeLines(c(
@@ -168,4 +153,3 @@ writeLines(c(
   "\\bottomrule", "\\end{tabular}",
   "\\\\[2pt]\\footnotesize Una replica per disegno (rep.\\ 001): dimostrazioni, non studi Monte Carlo. Le prime due righe sono la stessa replica stimata con due macchine diverse."),
   file.path(TAB, "tab_e3_reperti.tex"))
-cat("tab_e3_reperti scritta\n")
