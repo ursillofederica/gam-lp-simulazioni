@@ -1,31 +1,24 @@
-# ==============================================================================
-# 01_genera.R — Cap. 5: generazione dei dataset simulati (protocollo § 5.1)
+# 01_genera.R: generazione dei dataset simulati 
 #
-# Nota numerazione: capitoli e paragrafi citati nel codice seguono la
-# stesura interna; nel PDF della tesi scalano di uno (il capitolo dei
-# risultati, qui cap. 5, nel PDF e' il 4: l'introduzione non e' numerata).
-#
-# Contratto: ogni genera_<nome>(r) restituisce
-#   list(y_mat [T x H1], X_ctrl [T x K_ctrl], s [T], irf_vera, info)
+# ogni genera_<nome>(r) restituisce
+# list(y_mat [T x H1], X_ctrl [T x K_ctrl], s [T], irf_vera, info)
 # Seed: SEED_BASE[dgp] + r. Ogni replica salvata in output/dati/<dgp>/rep_<r>.rds
-# e MAI rigenerata se il file esiste (congelamento, § 5.1).
-# ==============================================================================
 
-# ---- Costanti del protocollo (§ 5.1) ----------------------------------------
+
+# Costanti
 TT      <- 100                 # righe del sistema
 H       <- 16                  # orizzonte massimo
 H1      <- H + 1               # numero orizzonti (h = 0..16)
 BURN    <- 1000                # burn-in traiettorie
 R_MAIN  <- 100                 # repliche per processo
-R_PILOT <- 20                  # repliche cancello pilota
+R_PILOT <- 20                  # repliche pilota
 
 SEED_BASE <- c(pilota = 1000, riferimento = 2000,
                persistente = 3000, nonlineare = 4000)
 
 DIR_OUT <- file.path("output", "dati")
 
-# ---- Sigma0 strutturata (pilota): sigma0 = 0.5, phi0 = 0.6 ------------------
-# Entrambe le parametrizzazioni la contengono -> il pilota valida entrambe.
+# Sigma0 strutturata (pilota): sigma0 = 0.5, phi0 = 0.6
 costruisci_sigma_strutturata <- function(sigma0, phi0, H1) {
     idx <- 1:H1
     outer(idx, idx, function(i, j)
@@ -33,7 +26,7 @@ costruisci_sigma_strutturata <- function(sigma0, phi0, H1) {
 }
 SIGMA0 <- costruisci_sigma_strutturata(sigma0 = 0.5, phi0 = 0.6, H1 = H1)
 
-# ---- Helper: righe sovrapposte da una traiettoria ---------------------------
+# righe sovrapposte da una traiettoria 
 # Da y (lunghezza >= inizio + TT + H) costruisce y_mat[t, h+1] = y_{inizio+t+h}.
 costruisci_righe <- function(y, inizio) {
     y_mat <- matrix(NA_real_, TT, H1)
@@ -41,10 +34,8 @@ costruisci_righe <- function(y, inizio) {
     y_mat
 }
 
-# ==============================================================================
-# PILOTA — righe indipendenti ben specificate (fase 1 + errori da SIGMA0)
-# Ruolo: criterio = verosimiglianza vera -> copertura nominale o e' un bug.
-# ==============================================================================
+# PILOTA: righe indipendenti ben specificate (fase 1 + errori da SIGMA0)
+# Ruolo: criterio = verosimiglianza vera -> copertura nominale o da sistemare
 genera_pilota <- function(r) {
     set.seed(SEED_BASE["pilota"] + r)
     h_grid <- 0:H
@@ -62,16 +53,15 @@ genera_pilota <- function(r) {
                      sigma0 = 0.5, phi0 = 0.6))
 }
 
-# ==============================================================================
-# PROCESSO 1 — riferimento, spirito HMP (eq:dgp_riferimento)
+          
+# PROCESSO 1: riferimento da HMP 
 #   y_t = sum_{p=1..5} phi_p y_{t-p} + eps_t + alpha*T^(-1/2) sum_j a_j eps_{t-j}
 #   eps_t = s_t + u_t;  alpha = 2;  a_j ~ N(0,1) iid PER REPLICA (j <= 10)
 #   phi_p: FISSI, da calibrazione AR(5) su crescita output USA (phi_calibrati.rds)
 #   Controlli: intercetta + 5 ritardi di y (liberi per orizzonte, nel modello)
 #   IRF vera: ricorsione psi (eq:irf_ricorsione), replica per replica
-# ------------------------------------------------------------------------------
+# 
 # Calibrazione: GDPC1 log-diff x100, 1960-2019Q4 (00_calibrazione_riferimento.R)
-# ==============================================================================
 genera_riferimento <- function(r) {
     set.seed(SEED_BASE["riferimento"] + r)
     phi   <- readRDS(file.path("output", "phi_calibrati.rds"))$phi   # FISSI
@@ -94,12 +84,11 @@ genera_riferimento <- function(r) {
     y_mat  <- costruisci_righe(y, inizio)
     s      <- s_full[inizio + 0:(TT - 1)]
 
-    # Controlli: intercetta + 5 ritardi di y (non standardizzati: scale ~ 1;
-    # la scala del prior si fissa nel driver)
+    # Controlli: intercetta + 5 ritardi di y (non standardizzati)
     ritardi <- sapply(1:5, function(p) y[(inizio - p) + 0:(TT - 1)])
     X_ctrl  <- cbind(1, ritardi)
 
-    # IRF vera: ricorsione psi (eq:irf_ricorsione), dipende dagli a_j pescati
+    # IRF vera: ricorsione psi
     psi <- numeric(H1)                  # psi[h+1] = psi_h
     psi[1] <- 1
     for (h in 1:H) {
@@ -115,11 +104,9 @@ genera_riferimento <- function(r) {
                      phi = phi, a = a, alpha = alpha))
 }
 
-# ==============================================================================
-# PROCESSO 2 — persistente, Esempio 2.1 (eq:dgp_persistente)
+# PROCESSO 2: persistente, Esempio 2.1
 #   y_t = rho y_{t-1} + eps_t;  eps_t = s_t + u_t;  rho = 0.9
 #   Controlli: intercetta + y_{t-1};  IRF vera: theta_h = rho^h
-# ==============================================================================
 genera_persistente <- function(r) {
     set.seed(SEED_BASE["persistente"] + r)
     rho  <- 0.9
@@ -129,7 +116,7 @@ genera_persistente <- function(r) {
     u_full <- rnorm(ntot)
     eps    <- s_full + u_full           # eps_t = s_t + u_t
 
-    y <- numeric(ntot)                  # allocato: parte da 0, il burn-in dimentica
+    y <- numeric(ntot)        
     for (t in 2:ntot) {
         y[t] <- rho * y[t-1] + eps[t]
     }
@@ -139,7 +126,7 @@ genera_persistente <- function(r) {
     s      <- s_full[inizio + 0:(TT-1)]
     X_ctrl <- cbind(1, y[(inizio - 1) + 0:(TT-1)])   # intercetta + y_{t-1}
 
-    irf_vera <- rho^(0:H)               # Esempio 2.1: theta_h = rho^h
+    irf_vera <- rho^(0:H)               
 
     list(y_mat = y_mat, X_ctrl = X_ctrl, s = s,
          irf_vera = irf_vera,
@@ -148,14 +135,11 @@ genera_persistente <- function(r) {
                      rho = rho))
 }
 
-# ==============================================================================
-# PROCESSO 3 — non lineare, GHKP Sez. 6.1 (eq:dgp_nonlineare)
+# PROCESSO 3 — non lineare, GHKP Sez. 6.1 
 #   x_t = eps1_t;  y_t = 0.5 y_{t-1} + 0.5 x_t + 0.3 x_{t-1}
 #                        - 0.4 f(x_t) - 0.3 f(x_{t-1}) + eps2_t;  f = pmax(x, 0)
 #   IRF vera (eq:irf_vera_nonlin), contrasti delta = +2 e -2
-# ------------------------------------------------------------------------------
 # Controlli: intercetta + y_{t-1} + x_{t-1}.
-# ==============================================================================
 irf_ghkp <- function(delta) {
     irf <- numeric(H1)
     irf[1] <- 0.5 * delta - 0.4 * max(delta, 0)
@@ -163,7 +147,7 @@ irf_ghkp <- function(delta) {
     for (h in 2:H) {
         irf[h+1] <- 0.5 * irf[h]
     }
-    irf                                  # ultima espressione = valore restituito
+    irf                                  
 }
 
 genera_nonlineare <- function(r) {
@@ -195,9 +179,7 @@ genera_nonlineare <- function(r) {
                      seed = SEED_BASE["nonlineare"] + r))
 }
 
-# ==============================================================================
-# Generazione e congelamento su disco
-# ==============================================================================
+# Generazione
 genera_e_salva <- function(dgp, n_rep) {
     gen <- switch(dgp,
                   pilota      = genera_pilota,
@@ -209,23 +191,14 @@ genera_e_salva <- function(dgp, n_rep) {
     dir.create(dir_dgp, recursive = TRUE, showWarnings = FALSE)
     for (r in 1:n_rep) {
         percorso <- file.path(dir_dgp, sprintf("rep_%03d.rds", r))
-        if (!file.exists(percorso)) saveRDS(gen(r), percorso)   # congelati
+        if (!file.exists(percorso)) saveRDS(gen(r), percorso)   
     }
     message(dgp, ": ", n_rep, " repliche in ", dir_dgp)
 }
 
-# ---- Esecuzione (decommentare quando i generatori sono pronti) --------------
-# genera_e_salva("pilota",      R_PILOT)
-# genera_e_salva("riferimento", R_MAIN)
-# genera_e_salva("persistente", R_MAIN)
-# genera_e_salva("nonlineare",  R_MAIN)
-
-# ==============================================================================
-# TANH — DGP liscio a segnale forte (banco di recupero, § 5.4 fase 2)
+# TANH — DGP liscio a segnale forte 
 # f(s,h) = 1.5*h*exp(-0.2h)*tanh(0.5*s); righe INDIPENDENTI (isola il recupero
 # della media), errori da SIGMA0. tanh e' DISPARI -> contrasti di TAGLIA
-# delta in {1,2} (la saturazione), non di segno.
-# ==============================================================================
 SEED_BASE["tanh"] <- 5000
 genera_tanh <- function(r) {
     set.seed(SEED_BASE["tanh"] + r)
@@ -233,8 +206,7 @@ genera_tanh <- function(r) {
     h_grid <- 0:H
     s  <- rnorm(TT)
     mu <- sapply(s, function(ss) ff(ss, h_grid))   # H1 x TT
-    # Errori IID come fase 2 (sd = sqrt(0.3)): il tanh e' banco di RECUPERO,
-    # la struttura d'errore e' irrilevante e IID e' il setup validato in fase 2.
+
     V  <- matrix(rnorm(TT * H1, 0, sqrt(0.3)), TT, H1)
     y_mat <- t(mu) + V
     X_ctrl <- matrix(1, TT, 1)                     # righe indipendenti: sola intercetta
