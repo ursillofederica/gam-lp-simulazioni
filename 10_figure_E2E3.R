@@ -1,16 +1,13 @@
-# Figure per § 5.3 (E2, alta persistenza) e § 5.4 (E3, non lineare).
-# Stesso stile grafico di 05_figure_E1.R.
-# Regola di lettura (protocollo § 5.1): a ogni c si usa la CELLA DIRETTA se
-# esiste, altrimenti la ripesatura con Pareto-k <= 0,7.
-# Output in FIG: fig_E2_*.pdf, fig_E3_*.pdf. Eseguire dalla cartella degli script.
+# Figure per 5.3 (E2, alta persistenza) e 5.4 (E3, non lineare).
+# Output in FIG: fig_E2_*.pdf, fig_E3_*.pdf.
 library(ggplot2)
 library(gridExtra)
 
 res <- readRDS("output/risultati_completi_22lug.rds")
 gam <- readRDS("output/gam_controllo_E3.rds")
 h <- 0:16
-FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
-if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   # fuori dal progetto tesi
+FIG <- "../../../05_tesi/figure"  
+if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }  
 
 col_str <- "#1a1a1a"; col_lkj <- "#8c8c8c"; col_acc <- "#e67e22"
 col_c <- c("1" = "#1a1a1a", "0,8" = "#7f8c8d", "0,7" = "#e67e22")
@@ -26,7 +23,6 @@ tema <- theme_minimal(base_size = 11) +
         legend.key.height = unit(4, "mm"),
         strip.text = element_text(size = 10.5, color = "grey20"))
 
-# ---- Fonte valida per ogni (esperimento, modello, c) -------------------------
 # cella = nome della cella da cui leggere; c_letto = riga da leggere in quella
 # cella. Cella diretta dove esiste (riga base), altrimenti ripesatura k <= 0,7.
 FONTE <- list(
@@ -56,13 +52,11 @@ leggi <- function(esp, mod, cc, serie = NULL) {
 }
 etich <- c(strutturata = "strutturata", lkj = "LKJ")
 
-# =============================================================================
-# E2 — § 5.3
-# =============================================================================
+
+# E2
 
 ## Figura 1: profilo di copertura per orizzonte, c=1 contro il c ottimo di
-## ciascun modello (strutturata 0,8, LKJ 0,7). I due c* hanno COLORI DISTINTI
-## in legenda (correzione richiesta: prima erano dello stesso colore).
+## ciascun modello (strutturata 0,8, LKJ 0,7).
 dprof <- rbind(
   data.frame(h = h, copertura = leggi("E2", "strutturata", "1")$copertura_h,
              serie = "c = 1", modello = "strutturata"),
@@ -86,9 +80,8 @@ p_e2_h <- ggplot(dprof, aes(h, copertura, color = serie)) +
   labs(x = "orizzonte h", y = "copertura empirica") +
   tema + theme(legend.position = "bottom")
 ggsave(file.path(FIG, "fig_E2_orizzonte.pdf"), p_e2_h, width = 8, height = 3.6)
-cat("fig_E2_orizzonte scritta\n")
 
-## Figura ampiezza / distorsione / RMSE per orizzonte a c=1 (gemella E1)
+## Figura ampiezza / distorsione / RMSE per orizzonte a c=1 
 diag_amp <- readRDS("output/diagnostiche_E2E3.rds")$E2
 dAR <- do.call(rbind, lapply(c("strutturata", "lkj"), function(m) {
   x <- diag_amp[[m]]$calibrazione$`1`
@@ -108,7 +101,6 @@ p_ar2 <- ggplot(dAR, aes(h, val, color = modello)) +
   labs(x = "orizzonte h", y = NULL) +
   tema + theme(legend.position = "bottom")
 ggsave(file.path(FIG, "fig_E2_amp_rmse.pdf"), p_ar2, width = 8.6, height = 3.4)
-cat("fig_E2_amp_rmse scritta\n")
 
 ## Figura 2: curva di copertura media in c (il punto c*)
 dcur <- do.call(rbind, lapply(c("strutturata", "lkj"), function(m)
@@ -135,9 +127,8 @@ p_e2_c <- ggplot(dcur, aes(c, copertura, color = modello)) +
   tema + theme(legend.position = c(0.18, 0.86),
                legend.background = element_rect(fill = "white", color = NA))
 ggsave(file.path(FIG, "fig_E2_curva_c.pdf"), p_e2_c, width = 5.4, height = 3.6)
-cat("fig_E2_curva_c scritta\n")
 
-## Figura divergenze per replica, sette celle (gemella di fig_E1_divergenze)
+## Figura divergenze per replica
 diag_e2e3 <- readRDS("output/diagnostiche_E2E3.rds")
 etich_cell <- c(strutturata = "strutturata, c=1", strutturata_c80 = "strutturata, c=0,8",
                 strutturata_c70 = "strutturata, c=0,7", lkj = "LKJ, c=1",
@@ -158,12 +149,10 @@ p_div2 <- ggplot(dv2, aes(div)) +
         panel.grid.major.y = element_line(color = "grey92", linewidth = 0.3),
         strip.text = element_text(size = 10, color = "grey20"))
 ggsave(file.path(FIG, "fig_E2_divergenze.pdf"), p_div2, width = 8.6, height = 4.2)
-cat("fig_E2_divergenze scritta\n")
 
-# =============================================================================
-# E3 — § 5.4
-# =============================================================================
 
+# E3 
+                             
 ## Figura 3: copertura per orizzonte nei due contrasti, c = 1
 dE3 <- do.call(rbind, lapply(c("strutturata", "lkj"), function(m)
   do.call(rbind, lapply(c("pos", "neg"), function(s)
@@ -184,9 +173,8 @@ p_e3_h <- ggplot(dE3, aes(h, copertura, color = contrasto)) +
   labs(x = "orizzonte h", y = "copertura empirica") +
   tema + theme(legend.position = "bottom")
 ggsave(file.path(FIG, "fig_E3_contrasti.pdf"), p_e3_h, width = 8, height = 3.6)
-cat("fig_E3_contrasti scritta\n")
 
-## Figura 4: temperare non muove il contrasto negativo (strutturata)
+## Figura 4
 dtemp <- do.call(rbind, lapply(c("pos", "neg"), function(s)
   do.call(rbind, lapply(c("1", "0.7"), function(cc)
     data.frame(h = h, copertura = leggi("E3", "strutturata", cc, s)$copertura_h,
@@ -205,9 +193,8 @@ p_e3_temp <- ggplot(dtemp, aes(h, copertura, color = c)) +
   labs(x = "orizzonte h", y = "copertura empirica") +
   tema + theme(legend.position = "bottom")
 ggsave(file.path(FIG, "fig_E3_temperare.pdf"), p_e3_temp, width = 8, height = 3.6)
-cat("fig_E3_temperare scritta\n")
 
-## Figura 5: GAM di controllo — la superficie spenta anche in frequentista
+## Figura 5: GAM di controllo
 dgam <- rbind(
   data.frame(h = gam$tab$h, irf = gam$tab$vera_pos, serie = "vera",
              contrasto = "delta == +2"),
@@ -230,9 +217,8 @@ p_gam <- ggplot(dgam, aes(h, irf, color = serie, linetype = serie)) +
   labs(x = "orizzonte h", y = "risposta d'impulso") +
   tema + theme(legend.position = "bottom")
 ggsave(file.path(FIG, "fig_E3_gam_controllo.pdf"), p_gam, width = 8, height = 3.4)
-cat("fig_E3_gam_controllo scritta\n")
 
-## Figura divergenze per replica, celle E3 (gemella di fig_E2_divergenze)
+## Figura divergenze per replica, celle E3
 etich_e3 <- c(strutturata = "strutturata, c=1", strutturata_c70 = "strutturata, c=0,7",
               lkj = "LKJ, c=1", lkj_c80 = "LKJ, c=0,8", lkj_c70 = "LKJ, c=0,7")
 ordine3 <- c("strutturata", "strutturata_c70", "lkj", "lkj_c80", "lkj_c70")
@@ -250,9 +236,8 @@ p_div3 <- ggplot(dv3, aes(div)) +
         panel.grid.major.y = element_line(color = "grey92", linewidth = 0.3),
         strip.text = element_text(size = 10, color = "grey20"))
 ggsave(file.path(FIG, "fig_E3_divergenze.pdf"), p_div3, width = 8.6, height = 4.6)
-cat("fig_E3_divergenze scritta\n")
 
-## Figura copertura media vs learning rate, per contrasto e modello (E3)
+## Figura copertura media vs learning rate, per contrasto e modello 
 dE3c <- do.call(rbind, lapply(c("strutturata", "lkj"), function(m)
   do.call(rbind, lapply(c("1", "0.9", "0.8", "0.7"), function(cc) rbind(
     data.frame(c = as.numeric(cc), copertura = mean(leggi("E3", m, cc, "pos")$copertura_h),
@@ -272,4 +257,3 @@ p_e3_curva <- ggplot(dE3c, aes(c, copertura, color = contrasto)) +
   labs(x = "learning rate c", y = "copertura media sugli orizzonti") +
   tema + theme(legend.position = "bottom")
 ggsave(file.path(FIG, "fig_E3_curva_c.pdf"), p_e3_curva, width = 8, height = 3.8)
-cat("fig_E3_curva_c scritta\n")
