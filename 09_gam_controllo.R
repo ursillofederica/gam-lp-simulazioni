@@ -1,7 +1,6 @@
 # GAM frequentista di controllo per E3/GHKP: stessa replica del reperto
 # bayesiano (rep_001), superficie tensoriale gemella (bs, k = c(6,8)),
-# REML, controlli lineari per orizzonte. Domanda: anche la macchina
-# frequentista spegne la non linearita'? Eseguire dalla cartella degli script.
+# REML, controlli lineari per orizzonte.
 library(mgcv)
 source("01_genera.R")   # TT, H, H1
 
@@ -28,8 +27,6 @@ out <- list(fit_summary = summary(fit), sp = fit$sp,
                              gam_pos = round(irf_pos, 3), vera_pos = round(d$irf_vera$pos, 3),
                              gam_neg = round(irf_neg, 3), vera_neg = round(d$irf_vera$neg, 3)))
 saveRDS(out, "output/gam_controllo_E3.rds")
-cat("EDF della superficie te(s,h):", round(out$edf_te, 2), "\n")
-cat("parametri di lisciatura (REML):", format(fit$sp, digits = 3), "\n\n")
+
 print(out$tab, row.names = FALSE)
-cat("\nmax |IRF gam| pos:", round(max(abs(irf_pos)), 3),
-    "| neg:", round(max(abs(irf_neg)), 3), "\n")
+
