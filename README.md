@@ -33,8 +33,7 @@ Operational scripts from the fit and refit rounds, included as documentation of
 the protocol declared in the thesis (init = 0.1; divergences > 10 -> refit with
 adapt_delta 0.99; rhat > 1.01 -> refit): `rifit_div.R`, `rifit_div2.R`,
 `rifit_rhat_23lug.R`, `rifit_superficie_23lug.R`, `rifit_tanh_23lug.R`,
-`nonlineare_c_fisso.R`, `run_nonlineare_51_100.R`, `coda_notturna_21lug.{R,sh}`,
-`coda2_21lug.sh`.
+`nonlineare_c_fisso.R`, `run_nonlineare_51_100.R`.
 
 `stan/` contains the six models: linear x {LKJ, structured} x {base, power
 posterior} plus the two surface models.
