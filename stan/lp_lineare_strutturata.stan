@@ -1,4 +1,4 @@
-// lp_lineare_strutturata.stan — Cap. 4, modello lineare + Sigma STRUTTURATA
+// lp_lineare_strutturata.stan: Cap. 4, modello lineare + Sigma STRUTTURATA
 //
 // Verosimiglianza multinormale per riga, shock osservato 
 // irf = TP_s1 * gamma. NC su gamma (AR(1) lungo k), Sigma
