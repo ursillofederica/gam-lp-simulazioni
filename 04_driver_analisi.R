@@ -1,4 +1,4 @@
-# Driver: analizza tutte le celle dello studio (E1-E3, celle base e a c
+# analizza tutte le celle dello studio (E1-E3, celle base e a c
 # fisso) con 03_analizza.R e salva il riepilogo unico usato da figure
 # e tabelle. Eseguire dalla cartella degli script.
 source("03_analizza.R")
@@ -33,4 +33,3 @@ for (cella in celle) {
 }
 
 saveRDS(risultati, "output/risultati_completi_22lug.rds")
-cat("\nSalvato output/risultati_completi_22lug.rds\n")
