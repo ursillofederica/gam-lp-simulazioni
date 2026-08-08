@@ -6,9 +6,6 @@ analyses and figures of the results chapter starting from the precomputed fits
 (distributed as release assets, see below), to vary them, or to regenerate
 everything from scratch.
 
-A note on numbering: the historical project folder is called `cap5`, but in the
-thesis PDF the results chapter is chapter 4 (the introduction is unnumbered).
-
 ## Structure
 
 Numbered pipeline (to be run with the working directory at the repo root):
