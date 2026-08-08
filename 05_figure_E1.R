@@ -1,10 +1,10 @@
-# Figure per § 5.2 (E1, disegno di riferimento), in ggplot2.
+# Figure per 5.2 (E1, disegno di riferimento)
 # Input:  output/risultati_completi_22lug.rds, output/diagnostiche_E1.rds.
 # Output in FIG: fig_E1_divergenze, fig_E1_pareto_k, fig_E1_copertura,
 # fig_E1_amp_rmse. Eseguire dalla cartella degli script.
 library(ggplot2)
-FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
-if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   # fuori dal progetto tesi
+FIG <- "../../../05_tesi/figure"    
+if (!dir.exists(FIG)) { FIG <- "figure"; dir.create(FIG, showWarnings = FALSE) }   
 
 res  <- readRDS("output/risultati_completi_22lug.rds")
 h <- 0:16
@@ -23,7 +23,7 @@ tema <- theme_minimal(base_size = 11) +
         legend.key.height = unit(4, "mm"),
         legend.background = element_rect(fill = "white", color = NA))
 
-# --- Pannello A: copertura per orizzonte, c = 1 -------------------------------
+# copertura per orizzonte, c = 1
 dA <- rbind(
   data.frame(h = h, copertura = res$riferimento_strutturata$`1`$copertura_h,
              modello = "strutturata"),
@@ -46,7 +46,7 @@ pA <- ggplot(dA, aes(h, copertura, color = modello)) +
 
 dir.create(FIG, showWarnings = FALSE)
 
-# --- Figura divergenze per replica -------------------------------------------
+# Figura divergenze per replica
 dg <- readRDS("output/diagnostiche_E1.rds")
 dv <- rbind(data.frame(modello = "LKJ", div = dg$lkj$repliche$div),
             data.frame(modello = "strutturata", div = dg$strutturata$repliche$div))
@@ -63,9 +63,8 @@ p_div <- ggplot(dv, aes(div)) +
         strip.text = element_text(size = 10.5, color = "grey20"))
 ggsave(file.path(FIG, "fig_E1_divergenze.pdf"),
        p_div, width = 8, height = 3)
-cat("figura divergenze scritta\n")
 
-# --- Figura Pareto-k per replica ----------------------------------------------
+# Figura Pareto-k per replica 
 kk <- rbind(
   data.frame(modello = "strutturata",
              c = rep(c("0,9","0,8","0,7"), each = 100),
@@ -90,14 +89,12 @@ p_k <- ggplot(kk, aes(c, k)) +
         strip.text = element_text(size = 10.5, color = "grey20"))
 ggsave(file.path(FIG, "fig_E1_pareto_k.pdf"),
        p_k, width = 8, height = 3.2)
-cat("figura pareto-k scritta\n")
 
-# --- Figura copertura per orizzonte, standalone --------------------------------
+# Figura copertura per orizzonte
 ggsave(file.path(FIG, "fig_E1_copertura.pdf"),
        pA + labs(title = NULL), width = 8, height = 3.6)
-cat("figura copertura standalone scritta\n")
 
-# --- Figura ampiezza + RMSE per orizzonte --------------------------------------
+# Figura ampiezza + RMSE per orizzonte
 dC <- rbind(
   data.frame(h = h, val = dg$strutturata$calibrazione$`1`$amp_h,  serie = "ampiezza", modello = "strutturata"),
   data.frame(h = h, val = dg$lkj$calibrazione$`1`$amp_h,          serie = "ampiezza", modello = "LKJ"),
@@ -117,4 +114,3 @@ p_ar <- ggplot(dC, aes(h, val, color = modello)) +
         strip.text = element_text(size = 10.5, color = "grey20"))
 ggsave(file.path(FIG, "fig_E1_amp_rmse.pdf"),
        p_ar, width = 8, height = 3.4)
-cat("figura ampiezza/RMSE scritta\n")
