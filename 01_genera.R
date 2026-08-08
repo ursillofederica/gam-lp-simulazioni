@@ -1,6 +1,10 @@
 # ==============================================================================
 # 01_genera.R — Cap. 5: generazione dei dataset simulati (protocollo § 5.1)
 #
+# Nota numerazione: capitoli e paragrafi citati nel codice seguono la
+# stesura interna; nel PDF della tesi scalano di uno (il capitolo dei
+# risultati, qui cap. 5, nel PDF e' il 4: l'introduzione non e' numerata).
+#
 # Contratto: ogni genera_<nome>(r) restituisce
 #   list(y_mat [T x H1], X_ctrl [T x K_ctrl], s [T], irf_vera, info)
 # Seed: SEED_BASE[dgp] + r. Ogni replica salvata in output/dati/<dgp>/rep_<r>.rds

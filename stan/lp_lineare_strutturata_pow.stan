@@ -1,25 +1,10 @@
-clude// ============================================================================
-// lp_lineare_strutturata.stan — Cap. 5, modello lineare + Sigma STRUTTURATA
-//
-// DERIVATO PER CANCELLAZIONE da phase4/bozza_LP_linear_h_smooth_nc_ctrl.stan
-// (l'originale resta intoccato). Modifiche rispetto all'originale:
-//   TOLTO:   primo stadio IV (pi_fs, sigma_u, Z_unique, shock_unique, v_t)
-//            e control function (rho_cf) — non servono: shock osservato.
-//   TOLTO:   TP_s0 (era zero per linearita'): irf = TP_s1 * gamma.
-//   CAMBIATO: controlli LIBERI PER ORIZZONTE (theta: vector -> matrix
-//            [K_ctrl, H1]), come da protocollo § 5.1.
-//   INVARIATO: NC su gamma (AR(1) lungo k), Sigma strutturata sqrt(ij),
-//            verosimiglianza multinormale per riga, prior del cap. 4.5,
-//            log_lik per riga (somma = log g, serve alla ripesatura).
-//
-// ⚠️ APERTO (decisione Federica): prior su phi = beta(2,4) TRONCATA a 0.95
-//    (come nell'originale); il cap. 4 dice "riscalata su (0, 0.95)".
-//    Allineare codice o testo.
-//
-// Mappa nomi codice -> tesi (nota_display_stan_cap4.md):
-//   sigma_h -> sigma_gamma | delta -> delta | sigma, phi -> parametri Sigma
 // ============================================================================
-
+// lp_lineare_strutturata_pow.stan — variante POWER POSTERIOR di
+// lp_lineare_strutturata.stan: unica differenza la verosimiglianza elevata a c_pow
+// (target += c_pow * lpdf), per le celle a c fisso e come base della
+// ripesatura per importance sampling. Tutto il resto e' identico al
+// file base.
+// ============================================================================
 data {
   int<lower=1> TT;             // n. righe del sistema (T)
   int<lower=1> K;              // dimensione base su h

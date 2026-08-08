@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Attende la fine di P3 (o lo riprende se il run e' morto), poi lancia
 # la coda notturna. Staccato dalla sessione (nohup): sopravvive ai /login.
-cd /Users/federicaursillo/Tesi/01_codice/GAM-LP/cap5
+cd "$(dirname "$0")"
 LOG_P3=output/run_nonlineare_51_100_21lug.log
 while true; do
     grep -q 'NONLINEARE 51:100 COMPLETATO' "$LOG_P3" && break

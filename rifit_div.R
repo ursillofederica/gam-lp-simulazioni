@@ -5,7 +5,7 @@
 # qualunque sia il loro numero di divergenze -> se persiste, finisce nel
 # rapporto finale, come da regola. (Versione 21/7 sera: il primo giro, da
 # scratchpad, e' stato interrotto a riferimento/strutturata rep_051.)
-setwd("/Users/federicaursillo/Tesi/01_codice/GAM-LP/cap5")
+# eseguire dalla cartella degli script
 source("02_fitta.R")
 bk <- "output/fit/_backup_div_21lug"; dir.create(bk, showWarnings = FALSE)
 SOGLIA <- 10

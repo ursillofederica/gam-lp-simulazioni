@@ -11,7 +11,7 @@
 # e non assunto: qui si rifa' con un seed diverso e si confronta.
 # Se torna a zero -> il reperto e' confermato e ora e' riproducibile.
 # Se recupera la soglia -> il § 5.4 va riscritto.
-setwd("/Users/federicaursillo/Tesi/01_codice/GAM-LP/cap5")
+# eseguire dalla cartella degli script
 source("02_fitta.R")
 
 bk <- "output/fit/_backup_superficie_23lug"; dir.create(bk, showWarnings = FALSE)

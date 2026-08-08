@@ -1,22 +1,16 @@
 // ============================================================================
 // lp_lineare_strutturata.stan — Cap. 5, modello lineare + Sigma STRUTTURATA
 //
-// DERIVATO PER CANCELLAZIONE da phase4/bozza_LP_linear_h_smooth_nc_ctrl.stan
-// (l'originale resta intoccato). Modifiche rispetto all'originale:
-//   TOLTO:   primo stadio IV (pi_fs, sigma_u, Z_unique, shock_unique, v_t)
-//            e control function (rho_cf) — non servono: shock osservato.
-//   TOLTO:   TP_s0 (era zero per linearita'): irf = TP_s1 * gamma.
-//   CAMBIATO: controlli LIBERI PER ORIZZONTE (theta: vector -> matrix
-//            [K_ctrl, H1]), come da protocollo § 5.1.
-//   INVARIATO: NC su gamma (AR(1) lungo k), Sigma strutturata sqrt(ij),
-//            verosimiglianza multinormale per riga, prior del cap. 4.5,
-//            log_lik per riga (somma = log g, serve alla ripesatura).
+// Verosimiglianza multinormale per riga, shock osservato (nessun primo
+// stadio IV); irf = TP_s1 * gamma. NC su gamma (AR(1) lungo k), Sigma
+// strutturata sqrt(ij), controlli LIBERI PER ORIZZONTE (theta: matrix
+// [K_ctrl, H1], protocollo § 5.1), prior del cap. 4.5, log_lik per riga
+// (somma = log g, serve alla ripesatura).
 //
-// ⚠️ APERTO (decisione Federica): prior su phi = beta(2,4) TRONCATA a 0.95
-//    (come nell'originale); il cap. 4 dice "riscalata su (0, 0.95)".
-//    Allineare codice o testo.
+// ⚠️ APERTO (decisione Federica): prior su phi = beta(2,4) TRONCATA a 0.95;
+//    il cap. 4 dice "riscalata su (0, 0.95)". Allineare codice o testo.
 //
-// Mappa nomi codice -> tesi (nota_display_stan_cap4.md):
+// Mappa nomi codice -> tesi:
 //   sigma_h -> sigma_gamma | delta -> delta | sigma, phi -> parametri Sigma
 // ============================================================================
 

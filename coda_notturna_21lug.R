@@ -6,7 +6,7 @@
 #    + celle nuove c70 per entrambi i modelli (protocollo k<=0.7:
 #    a c=0.7 il Pareto-k supera soglia anche per la strutturata).
 # Tutto riprendibile: fitta_blocco* saltano le repliche gia' su disco.
-setwd("/Users/federicaursillo/Tesi/01_codice/GAM-LP/cap5")
+# eseguire dalla cartella degli script
 source("02_fitta.R")
 
 cat("== 1. Superficie su GHKP (rep 001, archivio diagnosi) ==\n")

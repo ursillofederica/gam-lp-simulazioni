@@ -1,7 +1,7 @@
 // ============================================================================
 // lp_lineare_lkj.stan — Cap. 5, modello lineare + Sigma LIBERA (LKJ)
 //
-// DERIVATO da cap5/stan/lp_lineare_strutturata.stan: UNICA differenza il
+// DERIVATO da lp_lineare_strutturata.stan: UNICA differenza il
 // blocco di Sigma, sostituito con la parametrizzazione libera del cap. 4
 // (eq. sigma_lkj): Sigma = diag(tau) * R * diag(tau),
 // R ~ LKJ(eta = 2), tau_h ~ t3(0,1)+.

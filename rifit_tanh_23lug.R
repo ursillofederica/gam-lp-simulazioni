@@ -8,7 +8,7 @@
 # In piu' il fit su disco e' del 20/7, cioe' PRECEDENTE al fix init = 0,1 del
 # 21/7: le IRF a zero possono essere l'ennesima catena degenere.
 # Qui si rifa' il fit con il codice corrente e si confronta col riassunto.
-setwd("/Users/federicaursillo/Tesi/01_codice/GAM-LP/cap5")
+# eseguire dalla cartella degli script
 source("02_fitta.R")
 
 bk <- "output/fit/_backup_tanh_23lug"; dir.create(bk, showWarnings = FALSE)

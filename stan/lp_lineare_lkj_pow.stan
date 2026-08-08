@@ -1,16 +1,10 @@
 // ============================================================================
-// lp_lineare_lkj.stan — Cap. 5, modello lineare + Sigma LIBERA (LKJ)
-//
-// DERIVATO da cap5/stan/lp_lineare_strutturata.stan: UNICA differenza il
-// blocco di Sigma, sostituito con la parametrizzazione libera del cap. 4
-// (eq. sigma_lkj): Sigma = diag(tau) * R * diag(tau),
-// R ~ LKJ(eta = 2), tau_h ~ t3(0,1)+.
-// In Stan: fattore di Cholesky della correlazione (L_Omega) e scale per
-// orizzonte (tau); L_Sigma = diag_pre_multiply(tau, L_Omega).
-// Tutto il resto (NC su gamma, media, controlli per orizzonte, prior,
-// log_lik per la ripesatura) e' identico al file strutturato.
+// lp_lineare_lkj_pow.stan — variante POWER POSTERIOR di
+// lp_lineare_lkj.stan: unica differenza la verosimiglianza elevata a c_pow
+// (target += c_pow * lpdf), per le celle a c fisso e come base della
+// ripesatura per importance sampling. Tutto il resto e' identico al
+// file base.
 // ============================================================================
-
 data {
   int<lower=1> TT;             // n. righe del sistema (T)
   int<lower=1> K;              // dimensione base su h

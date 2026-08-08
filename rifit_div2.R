@@ -2,7 +2,7 @@
 # esteso a TUTTE le celle MC del disegno (14). Salta le repliche gia'
 # rifittate (se persiste: riportata) e la superficie (esclusa per
 # decisione del 21/7: reperto, non replica MC). Niente unlink.
-setwd("/Users/federicaursillo/Tesi/01_codice/GAM-LP/cap5")
+# eseguire dalla cartella degli script
 source("02_fitta.R")
 bk <- "output/fit/_backup_div_22lug"; dir.create(bk, showWarnings = FALSE)
 SPEC <- list(

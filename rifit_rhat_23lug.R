@@ -7,7 +7,7 @@
 # rep 067: catena 2 bloccata a log g -11256 contro -3011 delle altre tre
 #          (rhat 1.578, ess_bulk 7). rep 083: rhat 1.015, ess_bulk 338.
 # Protocollo (§ 5.1): rifit, mai esclusione. Backup prima di sovrascrivere.
-setwd("/Users/federicaursillo/Tesi/01_codice/GAM-LP/cap5")
+# eseguire dalla cartella degli script
 source("02_fitta.R")
 
 bk <- "output/fit/_backup_rhat_23lug"; dir.create(bk, showWarnings = FALSE)

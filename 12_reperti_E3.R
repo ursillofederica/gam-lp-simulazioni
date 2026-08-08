@@ -1,10 +1,10 @@
 # Reperti di E3 (fuori dalle celle MC: una replica per disegno).
-# Tre pezzi che mancavano al rapporto e alla tesi:
+# Tre pezzi:
 #   1. superficie bayesiana su GHKP  (output/fit/nonlineare/superficie_strutturata)
 #   2. GAM frequentista di controllo (output/gam_controllo_E3.rds)
 #   3. recupero a segnale forte, DGP tanh (output/fit/tanh/superficie_strutturata)
-# Produce: output/reperti_E3.rds (riassunti leggeri, cosi' il rapporto non
-# rilegge i fit da 2 MB), le figure di tesi e tab_e3_reperti.tex.
+# Produce: output/reperti_E3.rds (riassunti leggeri: le analisi a valle non
+# rileggono i fit da 2 MB), le figure di tesi e tab_e3_reperti.tex.
 # Eseguire dalla cartella degli script.
 library(ggplot2)
 FIG <- "../../../05_tesi/figure"    # destinazione delle figure di tesi
