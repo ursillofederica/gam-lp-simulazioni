@@ -1,9 +1,7 @@
 # Diagnostiche e calibrazione estesa per E2 (persistente) ed E3 (nonlineare):
-# generalizza 06_diagnostiche_E1.R a celle con base_c e ai due contrasti.
 # Output: output/diagnostiche_E2E3.rds. Eseguire dalla cartella degli script.
 source("03_analizza.R")
 
-# ristime per INIZIALIZZAZIONE (catene congelate all'avvio)
 INIT_REFIT <- list(
   "persistente/lkj"     = c(8, 22, 29, 39),
   "persistente/lkj_c80" = c(5, 30, 33, 38, 42),
@@ -47,7 +45,6 @@ out <- list()
 for (esp in names(CELLE)) {
   dgp <- CELLE[[esp]]$dgp
   for (m in CELLE[[esp]]$celle) {
-    cat(">>>", esp, dgp, m, "\n")
     fits <- lapply(list.files(file.path("output/fit", dgp, m),
                               pattern = "^rep_", full.names = TRUE), readRDS)
     R <- length(fits)
@@ -87,4 +84,3 @@ for (esp in names(CELLE)) {
   }
 }
 saveRDS(out, "output/diagnostiche_E2E3.rds")
-cat("Salvato output/diagnostiche_E2E3.rds\n")
