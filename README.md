@@ -29,12 +29,6 @@ Numbered pipeline (to be run with the working directory at the repo root):
 | `14_superficie_tanh_3d.R` | Extracts the fitted surface f(s,h) on a grid of s: reruns the tanh fit once (same seed as the stored finding) only to recover the spline coefficients; does not overwrite the stored fit. Produces `output/superficie_tanh_griglia.rds`. |
 | `15_figura_superficie_3d.R` | tanh recovery, figure 2: 3D surface f(s,h), true vs estimated (base-R `persp`, two panels). |
 
-Operational scripts from the fit and refit rounds, included as documentation of
-the protocol declared in the thesis (init = 0.1; divergences > 10 -> refit with
-adapt_delta 0.99; rhat > 1.01 -> refit): `rifit_div.R`, `rifit_div2.R`,
-`rifit_rhat_23lug.R`, `rifit_superficie_23lug.R`, `rifit_tanh_23lug.R`,
-`nonlineare_c_fisso.R`, `run_nonlineare_51_100.R`.
-
 `stan/` contains the six models: linear x {LKJ, structured} x {base, power
 posterior} plus the two surface models.
 
@@ -82,4 +76,6 @@ to touch if it changes).
 
 `01_genera.R` regenerates the datasets deterministically from the seeds;
 `02_fitta.R` refits (4 chains per replica, ~1400 fits: hours of computation on
-several cores). The refit protocol is in the operational scripts listed above.
+several cores). Refit protocol declared in the thesis: init = 0.1; more than
+10 divergences -> refit with adapt_delta 0.99; rhat > 1.01 -> refit (if it
+persists, it is reported).
