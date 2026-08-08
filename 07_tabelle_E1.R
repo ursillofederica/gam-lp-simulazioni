@@ -1,8 +1,8 @@
-# Tabelle LaTeX per il § 5.2 (E1), generate dai dati (riproducibili).
+# Tabelle LaTeX per il 5.2 (E1), generate dai dati 
 # Output in TAB: tab_e1_{protocollo,diagnostiche,ripesatura,cella,profilo}.tex
 # Eseguire dalla cartella degli script.
-TAB <- "../../../05_tesi/tabelle"    # destinazione delle tabelle di tesi
-if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) }   # fuori dal progetto tesi
+TAB <- "../../../05_tesi/tabelle"   
+if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) }   
 diag <- readRDS("output/diagnostiche_E1.rds")
 dir.create(TAB, showWarnings = FALSE)
 it <- function(x, d = 3) gsub("\\.", "{,}", formatC(x, format = "f", digits = d))
@@ -42,7 +42,6 @@ writeLines(c(
   blocco("strutturata", "strutturata"),
   "\\bottomrule", "\\end{tabular}"),
   file.path(TAB, "tab_e1_diagnostiche.tex"))
-cat("tabelle E1 scritte\n")
 
 ## Tabella 3: affidabilita' della ripesatura
 rr <- function(m, nome) {
@@ -61,7 +60,6 @@ writeLines(c(
   paste0(rr("strutturata", "strutturata"), " \\\\"),
   "\\bottomrule", "\\end{tabular}"),
   file.path(TAB, "tab_e1_ripesatura.tex"))
-cat("tabella ripesatura scritta\n")
 
 ## Tabella 4: vista di cella (calibrazione)
 cl <- function(cc) {
@@ -81,7 +79,7 @@ writeLines(c(
   "\\bottomrule", "\\end{tabular}"),
   file.path(TAB, "tab_e1_cella.tex"))
 
-## Tabella 5: profilo per orizzonte, doppio blocco
+## Tabella 5: profilo per orizzonte
 blocco_prof <- function(m) {
   x <- diag[[m]]$calibrazione$`1`
   sapply(1:17, function(i) paste(i - 1,
@@ -99,4 +97,3 @@ writeLines(c(
   paste0(blocco_prof("lkj"), " \\\\"),
   "\\bottomrule", "\\end{tabular}"),
   file.path(TAB, "tab_e1_profilo.tex"))
-cat("tabelle calibrazione scritte\n")
