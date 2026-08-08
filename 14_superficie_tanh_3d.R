@@ -1,10 +1,10 @@
 # Estrazione della superficie stimata f(s,h) su una griglia di s per il grafico
 # 3D del recupero tanh. Il fit salvato tiene solo i due contrasti: qui si
 # riesegue UNA volta il fit tanh buono (stesso seed del reperto, seed=1500)
-# solo per estrarre i coefficienti gamma. NON sovrascrive il fit su disco:
+# solo per estrarre i coefficienti gamma.
 # salva la superficie in output/superficie_tanh_griglia.rds.
 # Eseguire dalla cartella degli script.
-source("02_fitta.R")   # basi (B_H, nodi_s, J_S, K_H), MODELLI, costanti
+source("02_fitta.R")   # basi (B_H, nodi_s, J_S, K_H)
 
 d <- readRDS(file.path(DIR_OUT, "tanh", "rep_001.rds"))
 sd_stan <- costruisci_stan_data_superficie(d, deltas = c(2, 1))
@@ -37,4 +37,3 @@ saveRDS(list(h = 0:H, s = s_grid, est = surf_est, vera = surf_true),
 cat("range superficie stimata:", round(range(surf_est), 2),
     "| vera:", round(range(surf_true), 2), "\n")
 cat("scarto massimo stimata-vera:", round(max(abs(surf_est - surf_true)), 3), "\n")
-cat("Salvato output/superficie_tanh_griglia.rds\n")
