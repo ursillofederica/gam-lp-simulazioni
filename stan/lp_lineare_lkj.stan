@@ -1,4 +1,4 @@
-// lp_lineare_lkj.stan, Cap. 5, modello lineare + Sigma LIBERA (LKJ)
+// lp_lineare_lkj.stan, Cap. 4, modello lineare + Sigma LIBERA (LKJ)
 
 data {
   int<lower=1> TT;             // n. righe del sistema (T)
