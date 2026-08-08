@@ -1,17 +1,16 @@
-// ============================================================================
 // lp_lineare_lkj_pow.stan — variante POWER POSTERIOR di
 // lp_lineare_lkj.stan: unica differenza la verosimiglianza elevata a c_pow
 // (target += c_pow * lpdf), per le celle a c fisso e come base della
 // ripesatura per importance sampling. Tutto il resto e' identico al
 // file base.
-// ============================================================================
+
 data {
   int<lower=1> TT;             // n. righe del sistema (T)
   int<lower=1> K;              // dimensione base su h
   int<lower=1> H1;             // n. orizzonti (H+1)
   int<lower=1> N;              // = TT * H1
   int<lower=1> K_ctrl;         // n. controlli (P1: 5 ritardi; P2: 1)
-  matrix[N, K] TP;             // design: shock_t * psi_k(h)
+  matrix[N, K] TP;             // shock_t * psi_k(h)
   matrix[TT, H1] y_mat;
   matrix[TT, K_ctrl] X_ctrl;
   matrix[H1, K] TP_s1;         // base a shock unitario: irf = TP_s1 * gamma
@@ -31,7 +30,6 @@ parameters {
 transformed parameters {
   real<lower=0> sigma_h = exp(log_sigma_h);
 
-  // NC reconstruction di gamma (AR(1) lungo k)
   vector[K] gamma;
   {
     real scale_first = sigma_h / sqrt(1 - square(delta));
@@ -58,12 +56,12 @@ transformed parameters {
 }
 
 model {
-  // Verosimiglianza (pseudo-): righe indipendenti per costruzione del criterio
+  // Verosimiglianza (pseudo)
   for (t in 1:TT) {
     target += c_pow * multi_normal_cholesky_lpdf(y_mat[t]' | mu_mat[t]', L_Sigma);
   }
 
-  // Prior — cap. 4.4/4.5
+  // Prior 
   gamma_raw ~ std_normal();
   delta ~ beta(2, 2);
   log_sigma_h ~ normal(log(0.05), 1);
