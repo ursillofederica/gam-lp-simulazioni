@@ -1,7 +1,7 @@
 // lp_lineare_lkj_pow.stan — variante POWER POSTERIOR di
 // lp_lineare_lkj.stan: unica differenza la verosimiglianza elevata a c_pow
 // (target += c_pow * lpdf), per le celle a c fisso e come base della
-// ripesatura per importance sampling. Tutto il resto e' identico al
+// ripesatura per importance sampling. Tutto il resto è identico al
 // file base.
 
 data {
