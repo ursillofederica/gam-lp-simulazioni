@@ -12,7 +12,7 @@ for (m in c("lkj", "strutturata")) {
                             pattern = "^rep_", full.names = TRUE), readRDS)
   R <- length(fits)
 
-  ## 1) convergenza
+  # convergenza
   rhat <- sapply(fits, function(f) f$diagn$rhat_max)
   div  <- sapply(fits, function(f) f$diagn$divergenze)
   essb <- sapply(fits, function(f) f$diagn$ess_bulk_min)
@@ -25,7 +25,7 @@ for (m in c("lkj", "strutturata")) {
                      rhat_max = max(rhat), div_max_post = max(div),
                      ess_min = round(min(essb)), quota_div0 = mean(div == 0))
 
-  ## 2) ripesatura
+  # ripesatura
   sd_logg <- sapply(fits, function(f) sd(f$log_g))
   rip <- do.call(rbind, lapply(c(0.9, 0.8, 0.7), function(cc) {
     pw <- lapply(fits, function(f) pesi_psis(f$log_g, cc))
@@ -34,7 +34,7 @@ for (m in c("lkj", "strutturata")) {
                quota_k_alto = mean(k > 0.7), ess_rel_med = median(er))
   }))
 
-  ## 3) calibrazone estesa
+  # calibrazone estesa
   cal <- lapply(c("1" = 1, "0.9" = 0.9), function(cc) {
     per_rep <- lapply(fits, function(f) {
       w <- pesi_psis(f$log_g, cc)$w
