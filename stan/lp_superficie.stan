@@ -8,12 +8,14 @@ data {
   matrix[H1, J*K] TP_pos; matrix[H1, J*K] TP_neg; matrix[H1, J*K] TP_zero;
   real<lower=0> sigma_theta;
 }
+
 parameters {
   vector[J*K] gamma; real<lower=0,upper=1> delta;
   real<lower=0> sigma_h; real<lower=0> sd_shock;
   real<lower=0> sigma; real<lower=0,upper=0.95> phi;
   vector[K_ctrl] theta;
 }
+
 transformed parameters {
   matrix[TT, H1] mu_mat;
   { vector[N] mv = TP*gamma; vector[TT] cp = X_ctrl*theta;
@@ -23,6 +25,7 @@ transformed parameters {
     Sig[i,j] = square(sigma)*sqrt(1.0*i*j)/(1-square(phi))*pow(phi,1.0*abs(i-j));
   matrix[H1,H1] L_Sigma = cholesky_decompose(Sig);
 }
+
 model {
   for (t in 1:TT) y_mat[t]' ~ multi_normal_cholesky(mu_mat[t]', L_Sigma);
   delta ~ beta(2,2); phi ~ beta(2,4); sigma_h ~ gamma(2,0.1);
@@ -34,6 +37,7 @@ model {
   for (k in 1:K) for (j in 3:J)
     target += normal_lpdf(gamma[(j-1)*K+k]-2*gamma[(j-2)*K+k]+gamma[(j-3)*K+k] | 0, sd_shock);
 }
+
 generated quantities {
   vector[H1] irf_pos = TP_pos*gamma - TP_zero*gamma;
   vector[H1] irf_neg = TP_neg*gamma - TP_zero*gamma;
