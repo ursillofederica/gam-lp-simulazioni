@@ -46,6 +46,3 @@ cal <- list(
 )
 saveRDS(cal, file.path("output", "phi_calibrati.rds"))
 
-cat("phi calibrati:", round(phi, 4), "\n")
-cat("modulo minimo radici:", round(min(Mod(radici)), 3), "(>1 = stazionario)\n")
-cat("n oss:", length(gy), "| campione:", cal$campione, "\n")
