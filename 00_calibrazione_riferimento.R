@@ -1,15 +1,13 @@
-# ==============================================================================
 # 00_calibrazione_riferimento.R — calibrazione dei phi_p (Processo 1)
 #
 # Serie: GDPC1 (PIL reale USA, trimestrale, FRED), trasformata in crescita:
 #   g_t = 100 * diff(log(GDPC1))
-# Campione: 1960Q1-2019Q4 (esclusi i trimestri COVID: outlier che
-#   distorcerebbero l'AR — scelta dichiarata).
+# Campione: 1960Q1-2019Q4 
 # Stima: AR(5) via OLS con intercetta; si conservano i soli phi_1..phi_5
-#   (il DGP e' a media zero, l'intercetta si scarta).
+#   (il DGP è a media zero, l'intercetta si scarta).
 # Output: output/phi_calibrati.rds (coefficienti + provenienza)
 #         output/GDPC1_raw.csv (dati grezzi congelati per riproducibilità)
-# ==============================================================================
+
 
 url_fred <- "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GDPC1"
 raw_path <- file.path("output", "GDPC1_raw.csv")
