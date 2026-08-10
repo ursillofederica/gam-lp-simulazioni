@@ -60,6 +60,12 @@ With the fits on disk, the order is: `04_driver_analisi.R` (full analysis),
 figure and table scripts. Outside the thesis project, figures and tables are
 written to the local `figure/` and `tabelle/` folders.
 
+The pre-refit backups are deliberately not distributed. Two columns of the
+protocol tables are reconstructed by counting those backups: the number of
+replicas refit because of divergences (`07_tabelle_E1.R`, `11_tabelle_E2E3.R`)
+and the maximum divergence count before the refit. Without the backups they
+are printed as `--`; every other number in those tables is unaffected.
+
 The `risultati_derivati.tar` asset also contains the precomputed analysis
 `.rds` files (full results, diagnostics, findings, control GAM), useful for a
 direct comparison without rerunning anything.

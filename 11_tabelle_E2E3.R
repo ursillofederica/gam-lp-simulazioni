@@ -5,6 +5,7 @@ TAB <- "../../../05_tesi/tabelle"
 if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) }   
 it <- function(x, k = 3) gsub("\\.", "{,}", formatC(x, format = "f", digits = k))
 m_ <- function(x) paste0("$", x, "$")
+o  <- function(x) ifelse(is.na(x), "--", x)
 
 FONTE <- list(
   E2 = list(strutturata = list("1" = c("strutturata", "1"),
@@ -33,8 +34,12 @@ diretta <- function(esp, mod, cc) {
 }
 GC <- c("1", "0.9", "0.8", "0.7")
 
-#  Ristime 
+#  Ristime
+# I backup pre-ristima non sono distribuiti con la release: se mancano il
+# conteggio non e' ricostruibile e vale NA (la colonna esce "--"), altrimenti
+# le ristime da divergenze verrebbero contate 0 e attribuite tutte a rhat.
 reps_backup <- function(dirs, dgp, cella) {
+  if (!any(dir.exists(file.path("output/fit", dirs)))) return(NA_integer_)
   f <- unlist(lapply(dirs, function(dd)
     list.files(file.path("output/fit", dd),
                pattern = sprintf("^%s_%s_rep_[0-9]+", dgp, cella))))
@@ -47,8 +52,8 @@ tab_protocollo <- function(esp, celle, etich, file) {
     ct <- d[[esp]][[m]]$cert
     n_div  <- reps_backup(c("_backup_div_21lug", "_backup_div_22lug"), DGP[esp], m)
     n_rhat <- ct$rifit_div - n_div
-    paste(nome, m_(it(ct$base_c, 1)), ct$R, ct$rifit_init, n_div, n_rhat,
-          ifelse(is.na(ct$div_max_pre), "--", ct$div_max_pre),
+    paste(nome, m_(it(ct$base_c, 1)), ct$R, ct$rifit_init, o(n_div), o(n_rhat),
+          o(ct$div_max_pre),
           m_(it(ct$rhat_max, 4)), ct$div_max_post, ct$ess_min,
           m_(it(ct$quota_div0, 2)), sep = " & ")
   }

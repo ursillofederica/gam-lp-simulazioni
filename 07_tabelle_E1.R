@@ -6,11 +6,13 @@ if (!dir.exists(TAB)) { TAB <- "tabelle"; dir.create(TAB, showWarnings = FALSE) 
 diag <- readRDS("output/diagnostiche_E1.rds")
 dir.create(TAB, showWarnings = FALSE)
 it <- function(x, d = 3) gsub("\\.", "{,}", formatC(x, format = "f", digits = d))
+# div_max_pre e' NA se i backup pre-ristima non ci sono (non distribuiti)
+o  <- function(x) ifelse(is.na(x), "--", x)
 
 ## Tabella 1: protocollo di ristima e certificazione
 riga <- function(nome, m) {
   ct <- diag[[m]]$cert
-  paste(nome, ct$R, ct$rifit_init, ct$rifit_div, ct$div_max_pre,
+  paste(nome, ct$R, ct$rifit_init, ct$rifit_div, o(ct$div_max_pre),
         paste0("$", it(ct$rhat_max), "$"), ct$div_max_post, ct$ess_min,
         paste0("$", it(ct$quota_div0, 2), "$"), sep = " & ")
 }
