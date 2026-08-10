@@ -1,6 +1,6 @@
 # Estrazione della superficie stimata f(s,h) su una griglia di s per il grafico
 # 3D del recupero tanh. Il fit salvato tiene solo i due contrasti: qui si
-# riesegue UNA volta il fit tanh buono (stesso seed del reperto, seed=1500)
+# riesegue una volta il fit tanh buono (stesso seed del reperto, seed=1500)
 # solo per estrarre i coefficienti gamma.
 # salva la superficie in output/superficie_tanh_griglia.rds.
 # Eseguire dalla cartella degli script.
