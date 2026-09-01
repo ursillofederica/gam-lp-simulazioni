@@ -139,7 +139,7 @@ tab_ripesatura("E3",
   "tab_e3_ripesatura.tex")
 
 # Tabella: "convalida incrociata" (solo E2: piu' strade allo stesso c) ---
-# Per ogni (modello, c bersaglio) elenca le vie valide: fit diretto oppure
+# Per ogni (modello, c bersaglio) elenca le vie valide: stima diretta oppure
 # ripesatura con k_max <= 0.7 e la copertura che ciascuna restituisce.
 tab_crossval <- function(file) {
   celle_mod <- list(LKJ = c("lkj", "lkj_c90", "lkj_c80", "lkj_c70"),
@@ -154,7 +154,7 @@ tab_crossval <- function(file) {
         bc <- d$E2[[m]]$cert$base_c
         cop <- mean(d$E2[[m]]$calibrazione[[as.character(cc)]]$cop_h)
         if (bc == cc)
-          vie[[length(vie) + 1]] <- list(base = bc, cop = cop, via = "fit diretto", ord = 2)
+          vie[[length(vie) + 1]] <- list(base = bc, cop = cop, via = "stima diretta", ord = 2)
         else {
           rp <- d$E2[[m]]$ripesatura; km <- rp$k_max[rp$c == cc]
           if (length(km) && km <= 0.7)
